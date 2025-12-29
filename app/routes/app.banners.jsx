@@ -1,0 +1,304 @@
+import { useState } from "react";
+import Label1 from '../images/label_1.png'
+import Label2 from '../images/label_2.png'
+import Label3 from '../images/label_3.png'
+import Label4 from '../images/label_4.png'
+import Label5 from '../images/label_5.png'
+import Label6 from '../images/label_6.png'
+import Label7 from '../images/label_7.png'
+import Label8 from '../images/label_8.png'
+import Label9 from '../images/label_9.png'
+import Label10 from '../images/label_10.png'
+import Label11 from '../images/label_11.png'
+import Label12 from '../images/label_12.png'
+import Label13 from '../images/label_13.png'
+import Label14 from '../images/label_14.png'
+import Label15 from '../images/label_15.png'
+import Label16 from '../images/label_16.png'
+import Label17 from '../images/label_17.png'
+import Label18 from '../images/label_18.png'
+import Label19 from '../images/label_19.png'
+import Label20 from '../images/label_20.png'
+import Label21 from '../images/label_21.png'
+import Label22 from '../images/label_22.png'
+import Label23 from '../images/label_23.png'
+import Label24 from '../images/label_24.png'
+import Label25 from '../images/label_25.png'
+import Edit from "../images/edit.png";
+import MenuHorizontal from "../images/menu_horizontal.png";
+
+export default function Banners() {
+  const badges = [
+    Label1, Label2, Label3, Label4, Label5,
+    Label6, Label7, Label8, Label9, Label10,
+    Label11, Label12, Label13, Label14, Label15,
+    Label16, Label17, Label18, Label19, Label20,
+    Label21, Label22, Label23, Label24, Label25,
+  ];
+
+  const [tab, setTab] = useState("all");
+
+  const VISIBLE_COUNT = 5;
+  const ITEM_WIDTH = 180;
+  const [startIndex, setStartIndex] = useState(0);
+
+  const handleNext = () => {
+    if (startIndex < badges.length - VISIBLE_COUNT) {
+      setStartIndex(startIndex + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (startIndex > 0) {
+      setStartIndex(startIndex - 1);
+    }
+  };
+
+  return (
+    <s-page heading="Labels">
+      <s-button slot="secondary-actions">Label</s-button>
+      <s-button slot="secondary-actions">Label</s-button>
+      <s-button slot="primary-action" variant="primary">
+        Create labels
+      </s-button>
+
+      <p className="font-semibold text-[18px] pb-2 pt-5">Labels</p>
+      <div className="mb-6">
+        <s-paragraph>
+          Show labels inside the product image on product pages, collection pages
+          or more.
+        </s-paragraph>
+      </div>
+
+      <s-section padding="none">
+        <s-table>
+          <s-grid slot="filters" gridTemplateColumns="1fr auto">
+            <div className="inline-flex">
+              {["All", "Active", "Draft"].map((item) => (
+                <s-button
+                  key={item}
+                  size="slim"
+                  variant={tab === item ? "secondary" : "tertiary"}
+                  onClick={() => setStatus(item)}
+                >
+                  {item}
+                </s-button>
+              ))}
+            </div>
+            <s-button icon="search" variant="secondary" />
+          </s-grid>
+          <s-table-header-row>
+            <s-table-header>Priority</s-table-header>
+            <s-table-header>Preview</s-table-header>
+            <s-table-header>Name</s-table-header>
+            <s-table-header>Type</s-table-header>
+            <s-table-header>Status</s-table-header>
+            <s-table-header>Start time</s-table-header>
+            <s-table-header>End time</s-table-header>
+            <s-table-header>Action</s-table-header>
+          </s-table-header-row>
+
+          <s-table-body>
+            <s-table-row>
+              <s-table-cell>
+                <div className="flex items-center"><s-icon type="drag-handle" />1.</div>
+              </s-table-cell>
+              <s-table-cell>
+                <s-clickable
+                  border="base"
+                  borderRadius="base"
+                  overflow="hidden"
+                  inlineSize="40px"
+                  blockSize="40px"
+                >
+                  <s-image
+                    objectFit="cover"
+                    src="https://picsum.photos/id/29/80/80"
+                  />
+                </s-clickable>
+              </s-table-cell>
+
+              <s-table-cell>Badge</s-table-cell>
+              <s-table-cell>Text</s-table-cell>
+
+              <s-table-cell>
+                <s-badge tone="success">Active</s-badge>
+              </s-table-cell>
+
+              <s-table-cell>5 Mar at 01:00 PM</s-table-cell>
+              <s-table-cell>5 Mar at 01:00 PM</s-table-cell>
+
+              <s-table-cell>
+                <div className="inline-flex border rounded-md overflow-hidden">
+                  <button className="p-1 hover:bg-gray-100 border-r">
+                    <img
+                      src={MenuHorizontal}
+                      alt="Menu"
+                      className="w-4 h-4"
+                    />
+                  </button>
+
+                  <button className="p-1 hover:bg-gray-100">
+                    <img
+                      src={Edit}
+                      alt="Edit"
+                      className="w-4 h-4"
+                    />
+                  </button>
+                </div>
+              </s-table-cell>
+
+            </s-table-row>
+
+            <s-table-row>
+              <s-table-cell><div className="flex items-center"><s-icon type="drag-handle" />2.</div></s-table-cell>
+
+              <s-table-cell>
+                <s-clickable
+                  border="base"
+                  borderRadius="base"
+                  overflow="hidden"
+                  inlineSize="40px"
+                  blockSize="40px"
+                >
+                  <s-image
+                    objectFit="cover"
+                    src="https://picsum.photos/id/12/80/80"
+                  />
+                </s-clickable>
+              </s-table-cell>
+
+              <s-table-cell>Badge 1</s-table-cell>
+              <s-table-cell>Text</s-table-cell>
+
+              <s-table-cell>
+                <s-badge tone="success">Active</s-badge>
+              </s-table-cell>
+
+              <s-table-cell>5 Mar at 01:00 PM</s-table-cell>
+              <s-table-cell>5 Mar at 01:00 PM</s-table-cell>
+
+              <s-table-cell>
+                <div className="inline-flex border rounded-md overflow-hidden">
+                  <button className="p-1 hover:bg-gray-100 border-r">
+                    <img
+                      src={MenuHorizontal}
+                      alt="Menu"
+                      className="w-4 h-4"
+                    />
+                  </button>
+
+                  <button className="p-1 hover:bg-gray-100">
+                    <img
+                      src={Edit}
+                      alt="Edit"
+                      className="w-4 h-4"
+                    />
+                  </button>
+                </div>
+              </s-table-cell>
+
+            </s-table-row>
+
+            <s-table-row>
+              <s-table-cell><div className="flex items-center"><s-icon type="drag-handle" />3.</div></s-table-cell>
+
+              <s-table-cell>
+                <s-clickable
+                  border="base"
+                  borderRadius="base"
+                  overflow="hidden"
+                  inlineSize="40px"
+                  blockSize="40px"
+                >
+                  <s-image
+                    objectFit="cover"
+                    src="https://picsum.photos/id/324/80/80"
+                  />
+                </s-clickable>
+              </s-table-cell>
+
+              <s-table-cell>Badge 2</s-table-cell>
+              <s-table-cell>Text</s-table-cell>
+
+              <s-table-cell>
+                <s-badge tone="neutral">Draft</s-badge>
+              </s-table-cell>
+
+              <s-table-cell>5 Mar at 01:00 PM</s-table-cell>
+              <s-table-cell>5 Mar at 01:00 PM</s-table-cell>
+
+              <s-table-cell>
+                <div className="inline-flex border rounded-md overflow-hidden">
+                  <button className="p-1 hover:bg-gray-100 border-r">
+                    <img
+                      src={MenuHorizontal}
+                      alt="Menu"
+                      className="w-4 h-4"
+                    />
+                  </button>
+
+                  <button className="p-1 hover:bg-gray-100">
+                    <img
+                      src={Edit}
+                      alt="Edit"
+                      className="w-4 h-4"
+                    />
+                  </button>
+                </div>
+              </s-table-cell>
+            </s-table-row>
+          </s-table-body>
+        </s-table>
+      </s-section>
+
+      <s-section padding="none">
+        <s-card border="base">
+          <p className="font-semibold px-4 py-3 border-b">
+            Premade image badges
+          </p>
+
+          <div className="overflow-hidden px-4 py-4">
+            <div
+              className="flex gap-5 transition-transform duration-300"
+              style={{
+                transform: `translateX(-${startIndex * ITEM_WIDTH}px)`,
+              }}
+            >
+              {badges.map((badge, i) => (
+                <div
+                  key={i}
+                  className="w-40 h-40 border rounded-lg flex items-center justify-center bg-white p-2 flex-shrink-0"
+                >
+                  <img
+                    src={badge}
+                    alt=""
+                    className="max-w-full max-h-full"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-[#F7F7F7] flex justify-center py-2">
+            <button
+              onClick={handlePrev}
+              disabled={startIndex === 0}
+              className="p-1 bg-[#E3E3E3] rounded-l-lg disabled:opacity-40"
+            >
+              <s-icon type="chevron-left" />
+            </button>
+            <button
+              onClick={handleNext}
+              disabled={startIndex >= badges.length - VISIBLE_COUNT}
+              className="p-1 bg-[#E3E3E3] rounded-r-lg disabled:opacity-40"
+            >
+              <s-icon type="chevron-right" />
+            </button>
+          </div>
+        </s-card>
+      </s-section>
+      <div className="text-center mt-4"> <s-text variant="bodySm"> Learn about this app{" "} <a href="#" className="text-blue-600 underline" > link text </a> </s-text> </div>
+    </s-page>
+  );
+}

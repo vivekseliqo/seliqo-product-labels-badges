@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.color-picker-custom {
+  -webkit-appearance: none;
+  padding: 0;
+}
+.color-picker-custom::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.color-picker-custom::-webkit-color-swatch {
+  border-radius: 10px;
+}
