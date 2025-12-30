@@ -68,39 +68,39 @@ export default function TrustBadge() {
       <s-button slot="secondary-actions">Label</s-button>
       <s-button slot="secondary-actions">Label</s-button>
       <s-button slot="primary-action" variant="primary" onClick={() => navigate('/app/label-editor')}>Create trust badge</s-button>
-      <p className="font-semibold text-[18px] pb-2 pt-5">Trust Badge</p>
-      <div className="pb-4">
-        <s-paragraph>
-          Show trust badges below product title, price and image with diverse status
-        </s-paragraph>
-      </div>
-
-      <s-section>
-        <s-card border="base">
-          <div className="flex flex-col items-center justify-center py-16 text-center space-y-3">
-            <div className="w-32 h-36 mb-5">
-              <img src={createTask} alt='create-task' />
+      <div className="m-4 md:m-0">
+        <p className="font-semibold text-[18px] pb-2 pt-5">Trust Badge</p>
+        <div className="pb-4">
+          <s-paragraph>
+            Show trust badges below product title, price and image with diverse status
+          </s-paragraph>
+        </div>
+        <s-section>
+          <s-card border="base">
+            <div className="flex flex-col items-center justify-center py-5 md:py-16 text-center space-y-3">
+              <div className="w-32 h-36 mb-5">
+                <img src={createTask} alt='create-task' />
+              </div>
+              <p className="text-[16px] font-semibold">There is no Trust Badge here</p>
+              <p className="pb-3">
+                Create Trust Badge and enhance product visibility.
+              </p>
+              <s-button variant="primary" onClick={() => navigate('/app/label-editor')}>
+                Create Trust Badge
+              </s-button>
             </div>
-            <p className="text-[16px] font-semibold">There is no Trust Badge here</p>
-            <p className="pb-3">
-              Create Trust Badge and enhance product visibility.
-            </p>
-            <s-button variant="primary" onClick={() => navigate('/app/label-editor')}>
-              Create Trust Badge
-            </s-button>
-          </div>
-        </s-card>
-      </s-section>
-      <s-section padding="none">
-        <s-card border="base">
-          <div className="space-y-3">
-            <p className="font-semibold py-3 px-3 border-b">
-              Premade image badges
-            </p>
-            <div className="flex gap-4 items-center px-4 py-2">
-              <div className="overflow-hidden px-4 py-2">
+          </s-card>
+        </s-section>
+        <div className="mt-4">
+          <s-section padding="none">
+            <s-card border="base">
+              <p className="font-semibold px-4 py-3 border-b">
+                Premade image badges
+              </p>
+
+              <div className="overflow-hidden px-4 py-4">
                 <div
-                  className="flex gap-5 transition-transform duration-300 ease-in-out"
+                  className="flex gap-5 transition-transform duration-300"
                   style={{
                     transform: `translateX(-${startIndex * ITEM_WIDTH}px)`,
                   }}
@@ -112,35 +112,34 @@ export default function TrustBadge() {
                     >
                       <img
                         src={badge}
-                        alt={`label-${i}`}
+                        alt=""
                         className="max-w-full max-h-full"
                       />
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
-            <div className="bg-[#F7F7F7] flex justify-center py-2">
-              <button
-                onClick={handlePrev}
-                disabled={startIndex === 0}
-                className="p-1 bg-[#E3E3E3] rounded-l-lg disabled:opacity-40"
-              >
-                <s-icon type="chevron-left" />
-              </button>
 
-              <button
-                onClick={handleNext}
-                disabled={startIndex >= badges.length - VISIBLE_COUNT}
-                className="p-1 bg-[#E3E3E3] rounded-r-lg disabled:opacity-40"
-              >
-                <s-icon type="chevron-right" />
-              </button>
-            </div>
-
-          </div>
-        </s-card>
-      </s-section>
+              <div className="bg-[#F7F7F7] flex justify-center py-2">
+                <button
+                  onClick={handlePrev}
+                  disabled={startIndex === 0}
+                  className="p-1 bg-[#E3E3E3] rounded-l-lg disabled:opacity-40"
+                >
+                  <s-icon type="chevron-left" />
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={startIndex >= badges.length - VISIBLE_COUNT}
+                  className="p-1 bg-[#E3E3E3] rounded-r-lg disabled:opacity-40"
+                >
+                  <s-icon type="chevron-right" />
+                </button>
+              </div>
+            </s-card>
+          </s-section>
+        </div>
+      </div>
       <div className="text-center mt-4">
         <s-text variant="bodySm">
           Learn about this app{" "}

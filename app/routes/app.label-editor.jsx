@@ -61,6 +61,7 @@ export default function LabelEditor() {
   const [designOpen, setDesignOpen] = useState(true);
   const [selected, setSelected] = useState("top-left");
   const [startPeriod, setStartPeriod] = useState("AM");
+  const [fillType, setFillType] = useState("gradient");
   const [color1, setColor1] = useState('#004AB8');
   const [color2, setColor2] = useState('#CB72FF');
   const [textColor, setTextColor] = useState('#ffffff');
@@ -72,7 +73,7 @@ export default function LabelEditor() {
   const [selectedDropdown, setSelectedDropdown] = useState("above-title");
   const [badgeWidth, setBadgeWidth] = useState(110);
   const [badgeHeight, setBadgeHeight] = useState(45);
-  const [badgeRadius, setBadgeRadius] = useState(100);
+  const [badgeRadius, setBadgeRadius] = useState(0);
   const [badgeOpacity, setBadgeOpacity] = useState(100);
   const [badgeMargin, setBadgeMargin] = useState(0);
   const [badgePadding, setBadgePadding] = useState(0);
@@ -160,23 +161,23 @@ export default function LabelEditor() {
 
   return (
     <s-page heading="Seliqo Label" inlineSize="large">
-      <div className="flex items-center gap-2 py-3">
-        <div className="w-[250px]">
+      <div className="flex items-center justify-center md:justify-start gap-2 py-3">
+        <div className="w-[120px] md:w-[250px]">
           <s-text-field placeholder="Offer label" />
         </div>
 
-        <div className="w-[250px]">
+        <div className="w-[120px] md:w-[250px]">
           <s-number-field placeholder="1" min={0} max={100} />
         </div>
 
         <s-badge tone="success">Active</s-badge>
       </div>
 
-      <div className="flex bg-white border rounded-xl overflow-hidden gap-5 p-5">
+      <div className="flex flex-wrap bg-white border rounded-xl gap-5 p-3 md:p-5 m-4 md:m-0">
 
         {/* LEFT PANEL */}
         <div className="h-[90vh] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-          <div className="w-[360px] overflow-y-auto border rounded-xl">
+          <div className="w-full md:w-[360px] overflow-y-auto border rounded-xl">
             <p className='p-3 font-bold'>Label editor</p>
             <div className="overflow-hidden border-b">
               <div
@@ -201,20 +202,20 @@ export default function LabelEditor() {
                     <div className="flex gap-1 mb-4 border-b p-2">
                       <button
                         onClick={() => setLabelType('shape')}
-                        className={`${labelType === 'shape' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[12px] font-medium transition-all`}
+                        className={`${labelType === 'shape' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
                       >
                         Shape label
                       </button>
                       <button
                         onClick={() => setLabelType('image')}
-                        className={`${labelType === 'image' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[12px] font-medium transition-all`}
+                        className={`${labelType === 'image' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
                       >
                         Readymade image label
                       </button>
                     </div>
 
                     {labelType === 'shape' ? (
-                      <div className="flex gap-3 overflow-x-auto p-2" style={{ scrollbarWidth: 'thin' }}>
+                      <div className="grid grid-cols-5 gap-3 p-2" style={{ scrollbarWidth: 'thin' }}>
                         {Object.keys(shapeImages).map((s) => (
                           <div
                             key={s}
@@ -226,7 +227,14 @@ export default function LabelEditor() {
                               style={{
                                 width: '36px',
                                 height: '36px',
-                                background: `linear-gradient(90deg, ${color1}, ${color2})`,
+                                // background: `linear-gradient(90deg, ${color1}, ${color2})`,
+                                background:
+                                  fillType === "solid"
+                                    ? color1
+                                    : fillType === "gradient"
+                                      ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                      : "transparent",
+
                                 WebkitMaskImage: `url(${shapeImages[s]})`,
                                 WebkitMaskSize: 'contain',
                                 WebkitMaskRepeat: 'no-repeat',
@@ -241,7 +249,7 @@ export default function LabelEditor() {
                         ))}
                       </div>
                     ) : (
-                      <div className="flex gap-3 overflow-x-auto p-2" style={{ scrollbarWidth: 'thin' }}>
+                      <div className="grid grid-cols-5 gap-3 p-2" style={{ scrollbarWidth: 'thin' }}>
                         <div className='min-w-[56px] h-[56px]'>
                           <s-drop-zone
                             accessibilityLabel="Upload image"
@@ -278,48 +286,102 @@ export default function LabelEditor() {
                   </div>
                   <div className='mb-3'><s-divider /></div>
                   <p className='font-bold mb-3'>Color fill</p>
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <div
-                        className="relative w-[50px] h-[50px] rounded-[10px] border border-gray-200 overflow-hidden"
-                        style={{ background: `linear-gradient(90deg, ${color1}, ${color2})` }}
-                      >
+
+                  <div className="flex gap-2 mb-4">
+                    <button
+                      onClick={() => setFillType("solid")}
+                      className={`px-3 py-1 text-[12px] rounded-lg ${fillType === "solid"
+                        ? "bg-[#EBEBEB]"
+                        : ""
+                        }`}
+                    >
+                      Solid fill
+                    </button>
+
+                    <button
+                      onClick={() => setFillType("gradient")}
+                      className={`px-3 py-1 text-[12px] rounded-lg ${fillType === "gradient"
+                        ? "bg-[#EBEBEB]"
+                        : ""
+                        }`}
+                    >
+                      Gradient fill
+                    </button>
+                  </div>
+
+                  {fillType === "solid" && (
+                    <>
+                      <div className="flex items-center gap-3 mb-3">
                         <input
                           type="color"
                           value={color1}
                           onChange={(e) => setColor1(e.target.value)}
-                          className="absolute top-0 left-0 w-1/2 h-full opacity-0 cursor-pointer"
-                          title="Change Start Color"
+                          className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
                         />
+                        <div>
+                          <p className="text-[13px] font-medium">Background color</p>
+                          <p className="text-[12px] uppercase text-gray-500">{color1}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 mb-4">
+                        <input
+                          type="color"
+                          value={textColor}
+                          onChange={(e) => setTextColor(e.target.value)}
+                          className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                        />
+                        <div>
+                          <p className="text-[13px] font-medium">Text color</p>
+                          <p className="text-[12px] uppercase text-gray-500">{textColor}</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {fillType === "gradient" && (
+                    <>
+                      <div className="flex items-center gap-3 mb-3">
+                        <input
+                          type="color"
+                          value={color1}
+                          onChange={(e) => setColor1(e.target.value)}
+                          className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                        />
+                        <div>
+                          <p className="text-[13px] font-medium">Start background</p>
+                          <p className="text-[12px] uppercase text-gray-500">{color1}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 mb-3">
                         <input
                           type="color"
                           value={color2}
                           onChange={(e) => setColor2(e.target.value)}
-                          className="absolute top-0 right-0 w-1/2 h-full opacity-0 cursor-pointer"
-                          title="Change End Color"
+                          className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
                         />
+                        <div>
+                          <p className="text-[13px] font-medium">End background</p>
+                          <p className="text-[12px] uppercase text-gray-500">{color2}</p>
+                        </div>
                       </div>
 
-                      <div>
-                        <p className="text-[13px] font-medium">Label background color</p>
-                        <p className="text-[12px] uppercase">
-                          {color1}, {color2}
-                        </p>
+                      <div className="flex items-center gap-3 mb-4">
+                        <input
+                          type="color"
+                          value={textColor}
+                          onChange={(e) => setTextColor(e.target.value)}
+                          className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                        />
+                        <div>
+                          <p className="text-[13px] font-medium">Text color</p>
+                          <p className="text-[12px] uppercase text-gray-500">{textColor}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3 mb-3">
-                      <input
-                        type="color"
-                        value={textColor}
-                        onChange={(e) => setTextColor(e.target.value)}
-                        className="w-[50px] h-[50px] bg-white cursor-pointer color-picker-custom"
-                      />
-                      <div>
-                        <p className="text-[13px] font-medium">Text color</p>
-                        <p className="text-[12px] uppercase">{textColor}</p>
-                      </div>
-                    </div>
-                  </div>
+                    </>
+                  )}
+
                   <div className='mb-3'><s-divider /></div>
                   <p className='font-bold mb-2'>Interaction setting</p>
                   <div className='mb-2'>
@@ -636,17 +698,17 @@ export default function LabelEditor() {
                     <p className="font-bold mb-2">Label display</p>
 
                     <p className="mb-1 font-semibold">Device</p>
-                    <div className="flex gap-16">
+                    <div className="flex gap-5 md:gap-16">
                       <s-checkbox label="Desktop" />
                       <s-checkbox label="Mobile" />
                     </div>
 
                     <p className="mt-3 mb-1 font-semibold">Page</p>
-                    <div className="flex gap-16">
+                    <div className="flex gap-5 md:gap-16">
                       <s-checkbox label="Home page" />
                       <s-checkbox label="Product page" />
                     </div>
-                    <div className="flex gap-10">
+                    <div className="flex gap-5 md:gap-10">
                       <s-checkbox label="Collection page" />
                       <s-checkbox label="Cart page" />
                     </div>
@@ -659,50 +721,84 @@ export default function LabelEditor() {
 
         {/* RIGHT PANEL */}
         <div className="flex-1 bg-[#F6F6F7] overflow-y-auto border rounded-xl flex flex-col items-center">
-          <div className="w-full flex items-center justify-between border-b py-3 bg-white px-4">
-            <p className='font-bold text-black'>Preview</p>
-            <s-button commandFor="customer-menu" class="collection-btn">
-              <div className="flex items-center gap-1">
-                <s-icon type={previewPage === "collection" ? "collection" : "product"} />
-                <span>
-                  {previewPage === "collection" ? "Collection page" : "Product page"}
-                </span>
-                <s-icon type="chevron-down" />
-              </div>
-            </s-button>
-            <s-menu id="customer-menu">
-              <s-button icon="collection" onClick={() => setPreviewPage("collection")}>
-                Collection page
-              </s-button>
+          <div className="w-full border-b bg-white px-3 md:px-4 py-3">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
 
-              <s-button icon="product" onClick={() => setPreviewPage("product")}>
-                Product page
-              </s-button>
-            </s-menu>
-            <div className="flex items-center gap-1 bg-[#ebebeb] p-1 rounded-md">
-              <div
-                onClick={() => setActive('desktop')}
-                className={`cursor-pointer transition-all duration-200 p-1 rounded-md ${active === 'desktop' ? 'bg-white shadow-sm' : 'bg-transparent opacity-60'
-                  }`}
-              >
-                <s-icon type="desktop" />
+              <div className="flex items-center justify-between md:justify-start gap-3">
+                <p className="font-bold text-black">
+                  Preview
+                </p>
+
+                <div className="flex items-center gap-1 bg-[#ebebeb] p-1 rounded-md md:hidden">
+                  <div
+                    onClick={() => setActive("desktop")}
+                    className={`cursor-pointer p-1 rounded-md transition-all ${active === "desktop" ? "bg-white shadow-sm" : "opacity-60"
+                      }`}
+                  >
+                    <s-icon type="desktop" />
+                  </div>
+                  <div
+                    onClick={() => setActive("mobile")}
+                    className={`cursor-pointer p-1 rounded-md transition-all ${active === "mobile" ? "bg-white shadow-sm" : "opacity-60"
+                      }`}
+                  >
+                    <s-icon type="mobile" />
+                  </div>
+                </div>
               </div>
-              <div
-                onClick={() => setActive('mobile')}
-                className={`cursor-pointer transition-all duration-200 p-1 rounded-md ${active === 'mobile' ? 'bg-white shadow-sm' : 'bg-transparent opacity-60'}`}
-              >
-                <s-icon type="mobile" />
+
+              <div className="flex items-center gap-2">
+                <s-button commandFor="customer-menu" class="collection-btn w-full md:w-auto">
+                  <div className="flex items-center gap-1">
+                    <s-icon
+                      type={previewPage === "collection" ? "collection" : "product"}
+                    />
+                    <span className="text-sm">
+                      {previewPage === "collection"
+                        ? "Collection page"
+                        : "Product page"}
+                    </span>
+                    <s-icon type="chevron-down" />
+                  </div>
+                </s-button>
+
+                <s-menu id="customer-menu">
+                  <s-button icon="collection" onClick={() => setPreviewPage("collection")}>
+                    Collection page
+                  </s-button>
+                  <s-button icon="product" onClick={() => setPreviewPage("product")}>
+                    Product page
+                  </s-button>
+                </s-menu>
               </div>
+
+              <div className="hidden md:flex items-center gap-1 bg-[#ebebeb] p-1 rounded-md">
+                <div
+                  onClick={() => setActive("desktop")}
+                  className={`cursor-pointer p-1 rounded-md transition-all ${active === "desktop" ? "bg-white shadow-sm" : "opacity-60"
+                    }`}
+                >
+                  <s-icon type="desktop" />
+                </div>
+                <div
+                  onClick={() => setActive("mobile")}
+                  className={`cursor-pointer p-1 rounded-md transition-all ${active === "mobile" ? "bg-white shadow-sm" : "opacity-60"
+                    }`}
+                >
+                  <s-icon type="mobile" />
+                </div>
+              </div>
+
             </div>
           </div>
           <div className={`transition-all duration-500 ease-in-out ${active === 'mobile' ? 'w-[375px] min-h-[667px] shadow-2xl border-[6px] border-gray-800 rounded-[3rem] mb-10 overflow-hidden bg-white mt-5' : 'w-full'}`}>
             <s-card>
-              <div className={`space-y-4 bg-white rounded-2xl p-5 ${active === 'mobile' ? 'm-0' : 'm-5'}`}>
+              <div className={`space-y-4 bg-white rounded-2xl p-3 md:p-5 ${active === 'mobile' ? 'm-0' : 'm-2 md:m-5'}`}>
                 {previewPage === "collection" && (
                   <>
                     <p className="font-semibold text-xl">Your products</p>
 
-                    <div className={active === 'mobile' ? "grid grid-cols-2 gap-3" : "grid pb-4 grid-cols-4 gap-4"}>
+                    <div className={active === 'mobile' ? "grid grid-cols-2 gap-3" : "grid pb-4 grid-cols-1 md:grid-cols-4 gap-4"}>
                       {[1, 2, 3, 4].map((item) => (
                         <div key={item} className="flex-shrink-0">
                           <div className={`relative bg-[#E3EDFB] rounded-lg flex items-center justify-center overflow-hidden transition-all`}>
@@ -717,7 +813,14 @@ export default function LabelEditor() {
                                 borderRadius: `${badgeRadius}px`,
                                 ...(labelType === 'shape'
                                   ? {
-                                    background: `linear-gradient(90deg, ${color1}, ${color2})`,
+                                    // background: `linear-gradient(90deg, ${color1}, ${color2})`,
+                                    background:
+                                      fillType === "solid"
+                                        ? color1
+                                        : fillType === "gradient"
+                                          ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                          : "transparent",
+
                                     WebkitMaskImage: `url(${shapeImages[shape]})`,
                                     WebkitMaskSize: 'contain',
                                     WebkitMaskRepeat: 'no-repeat',
@@ -734,7 +837,7 @@ export default function LabelEditor() {
                             >
                               {labelType === 'shape' ? (
                                 <div className="flex items-center justify-center w-full h-full" style={{ color: textColor }}>
-                                  <span className={`${active === 'mobile' ? 'text-[7px]' : 'text-[10px]'} font-bold whitespace-nowrap text-center leading-tight`}>
+                                  <span className={`${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'} font-bold whitespace-nowrap text-center leading-tight`}>
                                     👔 Nike vendor
                                   </span>
                                 </div>
@@ -790,7 +893,12 @@ export default function LabelEditor() {
                             borderRadius: `${badgeRadius}px`,
                             ...(labelType === 'shape'
                               ? {
-                                background: `linear-gradient(90deg, ${color1}, ${color2})`,
+                                background:
+                                  fillType === "solid"
+                                    ? color1
+                                    : fillType === "gradient"
+                                      ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                      : "transparent",
                                 WebkitMaskImage: `url(${shapeImages[shape]})`,
                                 WebkitMaskSize: 'contain',
                                 WebkitMaskRepeat: 'no-repeat',
@@ -807,7 +915,7 @@ export default function LabelEditor() {
                         >
                           {labelType === 'shape' ? (
                             <div style={{ color: textColor }}>
-                              <span className="text-[10px] font-bold">
+                              <span className="text-[12px] font-bold">
                                 👔 Nike vendor
                               </span>
                             </div>

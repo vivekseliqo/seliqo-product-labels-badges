@@ -11,7 +11,7 @@ export default function Index() {
     <s-page heading="Dashboard">
       <s-button slot="secondary-actions">Label</s-button>
       <s-button slot="secondary-actions">Label</s-button>
-      <s-section>
+      <div className="m-4 md:m-0 border rounded-xl bg-white p-4 !mb-4">
         <s-card>
           <div className="space-y-3">
             <div className="flex justify-between items-start">
@@ -70,9 +70,9 @@ export default function Index() {
             </div>
           </div>
         </s-card>
-      </s-section>
+      </div>
 
-      <s-section>
+      <div className="m-4 md:m-0 border rounded-xl bg-white p-4 !mb-4">
         <s-card>
           <div className="flex justify-between items-center mb-4">
             <div className="flex gap-2 items-center">
@@ -94,7 +94,7 @@ export default function Index() {
             />}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <s-box padding="base" border="base" borderRadius="base">
               <div className="flex flex-col gap-2">
                 <s-text variant="bodySm">Total click badge</s-text>
@@ -124,7 +124,7 @@ export default function Index() {
             </s-box>
           </div>
         </s-card>
-      </s-section>
+      </div>
     </s-page>
   );
 }
