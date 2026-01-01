@@ -69,10 +69,10 @@ export default function TrustBadge() {
       <s-button slot="secondary-actions">Label</s-button>
       <s-button slot="primary-action" variant="primary" onClick={() => navigate('/app/label-editor')}>Create trust badge</s-button>
       <div className="m-4 md:m-0">
-        <p className="font-semibold text-[18px] pb-2 pt-5">Trust Badge</p>
+        <p className="font-semibold text-[18px] pb-2 pt-5">Trust badges</p>
         <div className="pb-4">
           <s-paragraph>
-            Show trust badges below product title, price and image with diverse status
+            Display trust badges below the product title, price, or image to build customer confidence.
           </s-paragraph>
         </div>
         <s-section>
@@ -81,12 +81,12 @@ export default function TrustBadge() {
               <div className="w-32 h-36 mb-5">
                 <img src={createTask} alt='create-task' />
               </div>
-              <p className="text-[16px] font-semibold">There is no Trust Badge here</p>
+              <p className="text-[16px] font-semibold">No trust badges yet</p>
               <p className="pb-3">
-                Create Trust Badge and enhance product visibility.
+                Create your first trust badge to highlight secure payments, guarantees, and reliability, helping shoppers feel confident about their purchase.
               </p>
               <s-button variant="primary" onClick={() => navigate('/app/label-editor')}>
-                Create Trust Badge
+                Create trust badge
               </s-button>
             </div>
           </s-card>
@@ -95,7 +95,7 @@ export default function TrustBadge() {
           <s-section padding="none">
             <s-card border="base">
               <p className="font-semibold px-4 py-3 border-b">
-                Premade image badges
+                Premade trust badges
               </p>
 
               <div className="overflow-hidden px-4 py-4">
@@ -140,7 +140,7 @@ export default function TrustBadge() {
           </s-section>
         </div>
       </div>
-      <div className="text-center mt-4">
+      <div className="text-center my-4">
         <s-text variant="bodySm">
           Learn about this app{" "}
           <a

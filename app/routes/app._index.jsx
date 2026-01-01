@@ -1,7 +1,8 @@
 import { useState } from "react";
 
 export default function Index() {
-  const [openDatePicker, setOpenDatePicker] = useState(false);
+  // const [openDatePicker, setOpenDatePicker] = useState(false);
+  const [isAppEnabled, setIsAppEnabled] = useState(false);
 
   const completed = 1;
   const total = 3;
@@ -11,7 +12,7 @@ export default function Index() {
     <s-page heading="Dashboard">
       <s-button slot="secondary-actions">Label</s-button>
       <s-button slot="secondary-actions">Label</s-button>
-      <div className="m-4 md:m-0 border rounded-xl bg-white p-4 !mb-4">
+      <div className="m-4 md:m-0 border rounded-xl bg-white p-4 !my-4">
         <s-card>
           <div className="space-y-3">
             <div className="flex justify-between items-start">
@@ -19,7 +20,7 @@ export default function Index() {
                 <div className="pb-2">
                   <s-text type="strong">Setup guide</s-text>
                 </div>
-                <s-paragraph>Let’s set things up.</s-paragraph>
+                <s-paragraph>Let’s get your app ready</s-paragraph>
               </div>
               <s-icon type="menu-horizontal" />
             </div>
@@ -47,11 +48,11 @@ export default function Index() {
                 <div className="space-y-1">
                   <div className="pb-2">
                     <s-text type="strong">
-                      Upload video
+                      Upload videos
                     </s-text>
                   </div>
                   <s-text variant="bodySm">
-                    Upload videos from system and your Instagram account
+                    Upload videos from your computer or connect your Instagram account to import content.
                   </s-text>
 
                   <div className="flex gap-2 pt-2">
@@ -63,10 +64,18 @@ export default function Index() {
                 </div>
               </div>
             </s-box>
-
-            <div className="flex gap-2 items-center text-gray-500">
-              <s-icon type="circle-dashed" />
-              <s-text type="strong">Enable app</s-text>
+            <div className="flex justify-between items-center">
+              <div
+                className="flex gap-2 items-center cursor-pointer select-none"
+                onClick={() => setIsAppEnabled((prev) => !prev)}
+              >
+                <s-icon
+                  type={isAppEnabled ? "check-circle-filled" : "circle-dashed"}
+                />
+                <s-text type="strong">
+                  {isAppEnabled ? "App enabled" : "Enable app"}
+                </s-text>
+              </div>
             </div>
           </div>
         </s-card>
@@ -79,7 +88,7 @@ export default function Index() {
               <s-text type="strong">Analytics</s-text>
               <s-badge tone="info">This month</s-badge>
             </div>
-            <s-button variant="secondary" onClick={() => setOpenDatePicker(!openDatePicker)}>
+            {/* <s-button variant="secondary" onClick={() => setOpenDatePicker(!openDatePicker)}>
               <div className="flex items-center">
                 <s-icon type="calendar" />This month
               </div>
@@ -91,20 +100,21 @@ export default function Index() {
                 console.log("Selected date:", e.detail);
                 setOpenDatePicker(false);
               }}
-            />}
+            />} */}
+            <s-date-field defaultView="2025-09" defaultValue="2025-09-01" />
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <s-box padding="base" border="base" borderRadius="base">
               <div className="flex flex-col gap-2">
-                <s-text variant="bodySm">Total click badge</s-text>
+                <s-text variant="bodySm">Total badge clicks</s-text>
                 <p className="text-[17px] font-bold">50</p>
               </div>
             </s-box>
 
             <s-box padding="base" border="base" borderRadius="base">
               <div className="flex flex-col gap-2">
-                <s-text variant="bodySm">Total click label</s-text>
+                <s-text variant="bodySm">Total label clicks</s-text>
                 <p className="text-[17px] font-bold">10</p>
               </div>
             </s-box>
@@ -118,7 +128,7 @@ export default function Index() {
 
             <s-box padding="base" border="base" borderRadius="base">
               <div className="flex flex-col gap-2">
-                <s-text variant="bodySm">AOV</s-text>
+                <s-text variant="bodySm">Average order value (AOV)</s-text>
                 <p className="text-[17px] font-bold">10</p>
               </div>
             </s-box>

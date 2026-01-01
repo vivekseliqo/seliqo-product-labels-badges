@@ -27,8 +27,7 @@ export default function Labels() {
 
           <div className="pb-4">
             <s-paragraph>
-              Show labels inside the product image on product pages,
-              collection pages or more.
+              Add labels to product images on product pages, collection pages, and more.
             </s-paragraph>
           </div>
 
@@ -40,11 +39,11 @@ export default function Labels() {
                 </div>
 
                 <p className="text-[16px] font-semibold">
-                  There is no label here
+                  No labels yet
                 </p>
 
                 <p className="pb-3">
-                  Create label and enhance product visibility.
+                  Create your first label to highlight offers, new arrivals, or important product details and increase visibility.
                 </p>
 
                 <s-button

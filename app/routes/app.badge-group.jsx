@@ -13,7 +13,7 @@ export default function BadgeGroup() {
         <p className="font-semibold text-[18px] pb-2 pt-5">Groups</p>
         <div className="pb-4">
           <s-paragraph>
-            Show badges group below or above add to cart button, price and image with diverse status
+            Organize and display badge groups above or below the Add to cart button, price, or product image.
           </s-paragraph>
         </div>
 
@@ -23,9 +23,9 @@ export default function BadgeGroup() {
               <div className="w-32 h-36 mb-5">
                 <img src={createTask} alt='create-task' />
               </div>
-              <p className="text-[16px] font-semibold">There is no Badge group here</p>
+              <p className="text-[16px] font-semibold">No badge groups yet</p>
               <p className="pb-3">
-                Create eye-catching trust and payment badges that reassure shoppers and boost confidence in your store.
+                Create your first badge group to display trust, payment, or promotional badges together and build customer confidence.
               </p>
               <s-button variant="primary" onClick={() => navigate('/app/label-editor')}>
                 Create group

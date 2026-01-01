@@ -59,10 +59,10 @@ export default function Badge() {
       <s-button slot="secondary-actions">Label</s-button>
       <s-button slot="primary-action" variant="primary" onClick={() => navigate('/app/label-editor')}>Create badge</s-button>
       <div className="m-4 md:m-0">
-        <p className="font-semibold text-[18px] pb-2 pt-5">Badge</p>
+        <p className="font-semibold text-[18px] pb-2 pt-5">Badges</p>
         <div className="pb-4">
           <s-paragraph>
-            Show badges below product title, price and image with diverse status
+            Display badges below the product title, price, or image to highlight key product statuses.
           </s-paragraph>
         </div>
         <s-section>
@@ -71,9 +71,9 @@ export default function Badge() {
               <div className="w-32 h-36 mb-5">
                 <img src={createTask} alt='create-task' />
               </div>
-              <p className="text-[16px] font-semibold">There is no Badge here</p>
+              <p className="text-[16px] font-semibold">No badges yet</p>
               <p className="pb-3">
-                Create Badge and enhance product visibility.
+                Create your first badge to showcase offers, trust signals, or special highlights and improve product visibility.
               </p>
               <s-button variant="primary" onClick={() => navigate('/app/label-editor')}>
                 Create Badge
@@ -130,7 +130,7 @@ export default function Badge() {
           </s-section>
         </div>
       </div>
-      <div className="text-center mt-4">
+      <div className="text-center my-4">
         <s-text variant="bodySm">
           Learn about this app{" "}
           <a
