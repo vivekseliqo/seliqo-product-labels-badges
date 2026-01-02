@@ -8,7 +8,7 @@ export default function BadgeGroup() {
     <s-page heading="Badge groups">
       <s-button slot="secondary-actions">Label</s-button>
       <s-button slot="secondary-actions">Label</s-button>
-      <s-button slot="primary-action" variant="primary" onClick={() => navigate('/app/label-editor')}>Create badge</s-button>
+      <s-button slot="primary-action" variant="primary" onClick={() => navigate('/app/label-editor', { state: { type: 'badgesGroup' } })}>Create badge</s-button>
       <div className="m-4 md:m-0">
         <p className="font-semibold text-[18px] pb-2 pt-5">Groups</p>
         <div className="pb-4">
@@ -27,7 +27,7 @@ export default function BadgeGroup() {
               <p className="pb-3">
                 Create your first badge group to display trust, payment, or promotional badges together and build customer confidence.
               </p>
-              <s-button variant="primary" onClick={() => navigate('/app/label-editor')}>
+              <s-button variant="primary" onClick={() => navigate('/app/label-editor', { state: { type: 'badgesGroup' } })}>
                 Create group
               </s-button>
             </div>

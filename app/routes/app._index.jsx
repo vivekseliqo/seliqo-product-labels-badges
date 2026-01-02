@@ -1,4 +1,5 @@
 import { useState } from "react";
+import enableAppImage from "../images/enable_app.png";
 
 export default function Index() {
   // const [openDatePicker, setOpenDatePicker] = useState(false);
@@ -64,10 +65,18 @@ export default function Index() {
                 </div>
               </div>
             </s-box>
+            <s-button
+              id="open-enable-app-modal"
+              commandFor="enable-app-modal"
+              command="--show"
+              className="hidden"
+            />
             <div className="flex justify-between items-center">
               <div
                 className="flex gap-2 items-center cursor-pointer select-none"
-                onClick={() => setIsAppEnabled((prev) => !prev)}
+                onClick={() =>
+                  document.getElementById("open-enable-app-modal")?.click()
+                }
               >
                 <s-icon
                   type={isAppEnabled ? "check-circle-filled" : "circle-dashed"}
@@ -77,6 +86,43 @@ export default function Index() {
                 </s-text>
               </div>
             </div>
+            <s-modal id="enable-app-modal" heading="Enable app embed">
+              <div className="space-y-4">
+                <s-paragraph>
+                  App embed is required to display labels/badges on your storefront.
+                </s-paragraph>
+
+                <div className="flex flex-col md:flex-row gap-4">
+                  <img
+                    src={enableAppImage}
+                    alt="Enable App"
+                    className="w-full md:w-1/2 rounded-lg"
+                  />
+
+                  <div className="flex flex-col justify-center gap-2">
+                    <s-text type="strong">
+                      Follow these steps to easily enable app embed:
+                    </s-text>
+
+                    <ol className="list-decimal pl-5 space-y-1">
+                      <li>Click on <strong>Enable app embed</strong></li>
+                      <li>Click on <strong>Save</strong></li>
+                    </ol>
+
+                    <s-button
+                      slot="primary-action"
+                      variant="primary"
+                      commandFor="enable-app-modal"
+                      command="--hide"
+                      onClick={() => setIsAppEnabled(true)}
+                    >
+                      Enable app embed
+                    </s-button>
+                  </div>
+                </div>
+              </div>
+            </s-modal>
+
           </div>
         </s-card>
       </div>

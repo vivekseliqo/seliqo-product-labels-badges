@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import productFrame from '../images/product_frame.png'
 import statusActivation from '../images/status_activation.png'
 import chorusShape from '../images/chorus_shape.png'
@@ -32,6 +33,41 @@ import Label22 from '../images/label_22.png'
 import Label23 from '../images/label_23.png'
 import Label24 from '../images/label_24.png'
 import Label25 from '../images/label_25.png'
+import TrustBadge1 from '../images/trust_badge_1.png'
+import TrustBadge2 from '../images/trust_badge_2.png'
+import TrustBadge3 from '../images/trust_badge_3.png'
+import TrustBadge4 from '../images/trust_badge_4.png'
+import TrustBadge5 from '../images/trust_badge_5.png'
+import TrustBadge6 from '../images/trust_badge_6.png'
+import TrustBadge7 from '../images/trust_badge_7.png'
+import TrustBadge8 from '../images/trust_badge_8.png'
+import TrustBadge9 from '../images/trust_badge_9.png'
+import TrustBadge10 from '../images/trust_badge_10.png'
+import TrustBadge11 from '../images/trust_badge_11.png'
+import TrustBadge12 from '../images/trust_badge_12.png'
+import TrustBadge13 from '../images/trust_badge_13.png'
+import TrustBadge14 from '../images/trust_badge_14.png'
+import TrustBadge15 from '../images/trust_badge_15.png'
+import TrustBadge16 from '../images/trust_badge_16.png'
+import TrustBadge17 from '../images/trust_badge_17.png'
+import TrustBadge18 from '../images/trust_badge_18.png'
+import TrustBadge19 from '../images/trust_badge_19.png'
+import TrustBadge20 from '../images/trust_badge_20.png'
+import TrustBadge21 from '../images/trust_badge_21.png'
+import TrustBadge22 from '../images/trust_badge_22.png'
+import TrustBadge23 from '../images/trust_badge_23.png'
+import TrustBadge24 from '../images/trust_badge_24.png'
+import TrustBadge25 from '../images/trust_badge_25.png'
+import TrustBadge26 from '../images/trust_badge_26.png'
+import TrustBadge27 from '../images/trust_badge_27.png'
+import TrustBadge28 from '../images/trust_badge_28.png'
+import TrustBadge29 from '../images/trust_badge_29.png'
+import TrustBadge30 from '../images/trust_badge_30.png'
+import TrustBadge31 from '../images/trust_badge_31.png'
+import TrustBadge32 from '../images/trust_badge_32.png'
+import TrustBadge33 from '../images/trust_badge_33.png'
+import TrustBadge34 from '../images/trust_badge_34.png'
+import TrustBadge35 from '../images/trust_badge_35.png'
 import Blank from '../images/blank.png'
 
 const positions = [
@@ -56,6 +92,9 @@ const shapeImages = {
 };
 
 export default function LabelEditor() {
+  const location = useLocation();
+  const { type } = location.state || { type: 'labels' };
+  console.log(type, 'type');
   const [active, setActive] = useState('desktop');
   const [open, setOpen] = useState(true);
   const [designOpen, setDesignOpen] = useState(true);
@@ -66,8 +105,8 @@ export default function LabelEditor() {
   const [color2, setColor2] = useState('#CB72FF');
   const [textColor, setTextColor] = useState('#ffffff');
   const [shape, setShape] = useState('rect');
-  const [labelType, setLabelType] = useState('shape');
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
+  const [labelType, setLabelType] = useState(type === 'labels' ? 'shape' : 'image');
+  const [selectedImageUrl, setSelectedImageUrl] = useState(type === 'badges' ? Label1 : TrustBadge1);
   const [previewPage, setPreviewPage] = useState("collection");
   const [productAlign, setProductAlign] = useState("left");
   const [selectedDropdown, setSelectedDropdown] = useState("above-title");
@@ -77,6 +116,19 @@ export default function LabelEditor() {
   const [badgeOpacity, setBadgeOpacity] = useState(100);
   const [badgeMargin, setBadgeMargin] = useState(0);
   const [badgePadding, setBadgePadding] = useState(0);
+  const [labelText, setLabelText] = useState("👔 Nike vendor");
+  const [enableCustomCss, setEnableCustomCss] = useState(false);
+  const [customCss, setCustomCss] = useState('');
+
+  useEffect(() => {
+    // scrollbar remove
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      // page leave karte time wapas normal
+      document.body.style.overflow = "";
+    };
+  }, []);
 
   const readymadeImages = [
     { id: 'free', url: Label1 },
@@ -105,6 +157,46 @@ export default function LabelEditor() {
     { id: 'label24', url: Label24 },
     { id: 'label25', url: Label25 },
   ];
+
+  const badges = [
+    { id: 'trustBadge1', url: TrustBadge1 },
+    { id: 'trustBadge2', url: TrustBadge2 },
+    { id: 'trustBadge3', url: TrustBadge3 },
+    { id: 'trustBadge4', url: TrustBadge4 },
+    { id: 'trustBadge5', url: TrustBadge5 },
+    { id: 'trustBadge6', url: TrustBadge6 },
+    { id: 'trustBadge7', url: TrustBadge7 },
+    { id: 'trustBadge8', url: TrustBadge8 },
+    { id: 'trustBadge9', url: TrustBadge9 },
+    { id: 'trustBadge10', url: TrustBadge10 },
+    { id: 'trustBadge11', url: TrustBadge11 },
+    { id: 'trustBadge12', url: TrustBadge12 },
+    { id: 'trustBadge13', url: TrustBadge13 },
+    { id: 'trustBadge14', url: TrustBadge14 },
+    { id: 'trustBadge15', url: TrustBadge15 },
+    { id: 'trustBadge16', url: TrustBadge16 },
+    { id: 'trustBadge17', url: TrustBadge17 },
+    { id: 'trustBadge18', url: TrustBadge18 },
+    { id: 'trustBadge19', url: TrustBadge19 },
+    { id: 'trustBadge20', url: TrustBadge20 },
+    { id: 'trustBadge21', url: TrustBadge21 },
+    { id: 'trustBadge22', url: TrustBadge22 },
+    { id: 'trustBadge23', url: TrustBadge23 },
+    { id: 'trustBadge24', url: TrustBadge24 },
+    { id: 'trustBadge25', url: TrustBadge25 },
+    { id: 'trustBadge26', url: TrustBadge26 },
+    { id: 'trustBadge27', url: TrustBadge27 },
+    { id: 'trustBadge28', url: TrustBadge28 },
+    { id: 'trustBadge29', url: TrustBadge29 },
+    { id: 'trustBadge30', url: TrustBadge30 },
+    { id: 'trustBadge31', url: TrustBadge31 },
+    { id: 'trustBadge32', url: TrustBadge32 },
+    { id: 'trustBadge33', url: TrustBadge33 },
+    { id: 'trustBadge34', url: TrustBadge34 },
+    { id: 'trustBadge35', url: TrustBadge35 },
+  ];
+
+  const findTrustImage = type === 'trustBadges' ? badges : readymadeImages
 
   const handleDrop = (event) => {
     const files = event.detail?.files || event.target?.files;
@@ -159,6 +251,22 @@ export default function LabelEditor() {
     { id: 'after-price', label: 'After product price', className: 'bottom-center' },
   ];
 
+  const parseCustomCss = (cssText) => {
+    if (!enableCustomCss || !cssText) return {};
+
+    return cssText.split(';').reduce((acc, rule) => {
+      const [key, value] = rule.split(':');
+      if (!key || !value) return acc;
+
+      const jsKey = key
+        .trim()
+        .replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+
+      acc[jsKey] = value.trim();
+      return acc;
+    }, {});
+  };
+
   return (
     <s-page heading="Seliqo Label" inlineSize="large">
       <div className="flex items-center justify-center md:justify-start gap-2 py-3">
@@ -176,9 +284,9 @@ export default function LabelEditor() {
       <div className="flex flex-wrap bg-white border rounded-xl gap-5 p-3 md:p-5 m-4 md:m-0">
 
         {/* LEFT PANEL */}
-        <div className="h-[90vh] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+        <div className="overflow-y-auto h-[85vh]" style={{ scrollbarWidth: 'thin' }}>
           <div className="w-full md:w-[360px] overflow-y-auto border rounded-xl">
-            <p className='p-3 font-bold'>Label editor</p>
+            <p className='p-3 font-bold'>{type === 'badgesGroup' ? 'Badge group editor' : 'Label editor'}</p>
             <div className="overflow-hidden border-b">
               <div
                 className="bg-[#F3F3F3] flex justify-between p-4 cursor-pointer"
@@ -186,7 +294,7 @@ export default function LabelEditor() {
               >
                 <div className="flex gap-1 items-center">
                   <s-icon type="paint-brush-flat" />
-                  <b>Label design setting</b>
+                  <b>{type === 'badgesGroup' ? 'Badge group design setting' : 'Label design setting'}</b>
                 </div>
                 <div className={`transition-transform duration-300 ${designOpen ? "rotate-180" : ""}`}>
                   <s-icon type="chevron-down" />
@@ -197,87 +305,113 @@ export default function LabelEditor() {
                   }`}
               >
                 <div className='p-3'>
-                  <p className='mb-3 font-bold'>Shapes Design</p>
-                  <div className='border rounded-lg'>
-                    <div className="flex gap-1 mb-4 border-b p-2">
-                      <button
-                        onClick={() => setLabelType('shape')}
-                        className={`${labelType === 'shape' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
-                      >
-                        Shape label
-                      </button>
-                      <button
-                        onClick={() => setLabelType('image')}
-                        className={`${labelType === 'image' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
-                      >
-                        Readymade image label
-                      </button>
+                  <p className='mb-3 font-bold'>{type === 'badgesGroup' ? 'Add created badge' : 'Shapes Design'}</p>
+                  {type === 'badgesGroup' ?
+                    <div className="grid grid-cols-5 gap-3 p-2 max-h-[150px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                      <div className='min-w-[56px] h-[56px]'>
+                        <s-drop-zone
+                          accessibilityLabel="Upload image"
+                          accept=".jpg,.png,.gif"
+                          onChange={handleDrop}
+                          onDrop={handleDrop}
+                        />
+                      </div>
+
+                      {findTrustImage.map((img) => (
+                        <div
+                          key={img.id}
+                          onClick={() => setSelectedImageUrl(img.url)}
+                          className={`min-w-[56px] h-[56px] border-2 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden ${selectedImageUrl === img.url ? 'border-blue-600 bg-blue-50' : 'border-gray-100'
+                            }`}
+                        >
+                          <img src={img.url} alt={img.id} className="w-10 h-10 object-contain" />
+                        </div>
+                      ))}
                     </div>
+                    : <div className='border rounded-lg'>
+                      <div className="flex gap-1 mb-4 border-b p-2">
+                        {type === 'labels' && <button
+                          onClick={() => setLabelType('shape')}
+                          className={`${labelType === 'shape' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
+                        >
+                          Shape label
+                        </button>}
+                        <button
+                          onClick={() => setLabelType('image')}
+                          className={`${labelType === 'image' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
+                        >
+                          Readymade image label
+                        </button>
+                      </div>
 
-                    {labelType === 'shape' ? (
-                      <div className="grid grid-cols-5 gap-3 p-2" style={{ scrollbarWidth: 'thin' }}>
-                        {Object.keys(shapeImages).map((s) => (
-                          <div
-                            key={s}
-                            onClick={() => setShape(s)}
-                            className={`min-w-[56px] h-[56px] border-2 rounded-lg flex items-center justify-center cursor-pointer transition-all ${shape === s ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-300'
-                              }`}
-                          >
-                            <div
-                              style={{
-                                width: '36px',
-                                height: '36px',
-                                // background: `linear-gradient(90deg, ${color1}, ${color2})`,
-                                background:
-                                  fillType === "solid"
-                                    ? color1
-                                    : fillType === "gradient"
-                                      ? `linear-gradient(90deg, ${color1}, ${color2})`
-                                      : "transparent",
+                      {labelType === 'shape' ? (
+                        <>
+                          {type === 'labels' && <div className="grid grid-cols-5 gap-3 p-2 max-h-[150px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                            {Object.keys(shapeImages).map((s) => (
+                              <div
+                                key={s}
+                                onClick={() => setShape(s)}
+                                className={`min-w-[56px] h-[56px] border-2 rounded-lg flex items-center justify-center cursor-pointer transition-all ${shape === s ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-300'
+                                  }`}
+                              >
+                                <div
+                                  style={{
+                                    width: '36px',
+                                    height: '36px',
+                                    // background: `linear-gradient(90deg, ${color1}, ${color2})`,
+                                    background:
+                                      fillType === "solid"
+                                        ? color1
+                                        : fillType === "gradient"
+                                          ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                          : "transparent",
 
-                                WebkitMaskImage: `url(${shapeImages[s]})`,
-                                WebkitMaskSize: 'contain',
-                                WebkitMaskRepeat: 'no-repeat',
-                                WebkitMaskPosition: 'center',
-                                maskImage: `url(${shapeImages[s]})`,
-                                maskSize: 'contain',
-                                maskRepeat: 'no-repeat',
-                                maskPosition: 'center',
-                              }}
+                                    WebkitMaskImage: `url(${shapeImages[s]})`,
+                                    WebkitMaskSize: 'contain',
+                                    WebkitMaskRepeat: 'no-repeat',
+                                    WebkitMaskPosition: 'center',
+                                    maskImage: `url(${shapeImages[s]})`,
+                                    maskSize: 'contain',
+                                    maskRepeat: 'no-repeat',
+                                    maskPosition: 'center',
+                                  }}
+                                />
+                              </div>
+                            ))}
+                          </div>}
+                        </>
+                      ) : (
+                        <div className="grid grid-cols-5 gap-3 p-2 max-h-[150px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                          <div className='min-w-[56px] h-[56px]'>
+                            <s-drop-zone
+                              accessibilityLabel="Upload image"
+                              accept=".jpg,.png,.gif"
+                              onChange={handleDrop}
+                              onDrop={handleDrop}
                             />
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-5 gap-3 p-2" style={{ scrollbarWidth: 'thin' }}>
-                        <div className='min-w-[56px] h-[56px]'>
-                          <s-drop-zone
-                            accessibilityLabel="Upload image"
-                            accept=".jpg,.png,.gif"
-                            onChange={handleDrop}
-                            onDrop={handleDrop}
-                          />
-                        </div>
 
-                        {readymadeImages.map((img) => (
-                          <div
-                            key={img.id}
-                            onClick={() => setSelectedImageUrl(img.url)}
-                            className={`min-w-[56px] h-[56px] border-2 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden ${selectedImageUrl === img.url ? 'border-blue-600 bg-blue-50' : 'border-gray-100'
-                              }`}
-                          >
-                            <img src={img.url} alt={img.id} className="w-10 h-10 object-contain" />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                          {findTrustImage.map((img) => (
+                            <div
+                              key={img.id}
+                              onClick={() => setSelectedImageUrl(img.url)}
+                              className={`min-w-[56px] h-[56px] border-2 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden ${selectedImageUrl === img.url ? 'border-blue-600 bg-blue-50' : 'border-gray-100'
+                                }`}
+                            >
+                              <img src={img.url} alt={img.id} className="w-10 h-10 object-contain" />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>}
 
                   <div className='my-3'><s-divider /></div>
                   <div className='mb-3'>
-                    <p className='mb-1 font-bold'>Label text</p>
+                    <p className='mb-1'>Label text</p>
                     <s-text-field
-                      placeholder="Hide label"
+                      placeholder="Enter label text"
+                      value={labelText}
+                      onInput={(e) => setLabelText(e.target.value)}
                     />
                     <p className='mb-1 mt-3'>If vendor not exists on selected product</p>
                     <s-text-field
@@ -287,26 +421,30 @@ export default function LabelEditor() {
                   <div className='mb-3'><s-divider /></div>
                   <p className='font-bold mb-3'>Color fill</p>
 
-                  <div className="flex gap-2 mb-4">
-                    <button
-                      onClick={() => setFillType("solid")}
-                      className={`px-3 py-1 text-[12px] rounded-lg ${fillType === "solid"
-                        ? "bg-[#EBEBEB]"
-                        : ""
-                        }`}
-                    >
-                      Solid fill
-                    </button>
+                  <div className="flex mb-4">
+                    <div className="inline-flex border border-gray-300 rounded-lg bg-white overflow-hidden">
+                      <button
+                        onClick={() => setFillType("solid")}
+                        className={`px-3 py-1 text-[12px] font-medium transition
+                            ${fillType === "solid"
+                            ? "bg-[#EBEBEB] text-black"
+                            : "bg-white text-gray-700"
+                          }`}
+                      >
+                        Solid fill
+                      </button>
 
-                    <button
-                      onClick={() => setFillType("gradient")}
-                      className={`px-3 py-1 text-[12px] rounded-lg ${fillType === "gradient"
-                        ? "bg-[#EBEBEB]"
-                        : ""
-                        }`}
-                    >
-                      Gradient fill
-                    </button>
+                      <button
+                        onClick={() => setFillType("gradient")}
+                        className={`px-3 py-1 text-[12px] font-medium transition
+                            ${fillType === "gradient"
+                            ? "bg-[#EBEBEB] text-black"
+                            : "bg-white text-gray-700"
+                          }`}
+                      >
+                        Gradient fill
+                      </button>
+                    </div>
                   </div>
 
                   {fillType === "solid" && (
@@ -553,12 +691,22 @@ export default function LabelEditor() {
                   <div className='mb-3'>
                     <p className="font-semibold mb-2">Custom</p>
                     <s-checkbox
-                      label="Custom css"
+                      label="Custom CSS"
+                      checked={enableCustomCss}
+                      onChange={(e) => setEnableCustomCss(e.target.checked)}
                     />
                     <s-text-area
-                      value="Enter your custom css here"
-                      rows={3}
+                      value={customCss}
+                      placeholder="Enter your custom CSS here"
+                      rows={4}
+                      disabled={!enableCustomCss}
+                      onInput={(e) => setCustomCss(e.target.value)}
                     />
+                    {enableCustomCss && (
+                      <p className="text-[11px] text-gray-500 mt-1">
+                        Example: font-size:14px; text-transform:uppercase;
+                      </p>
+                    )}
                   </div>
                   <div className='mb-3'><s-divider /></div>
                   <div className='mb-3'>
@@ -591,7 +739,7 @@ export default function LabelEditor() {
                           <div className="flex-1">
                             <s-text-field value="09:00" />
                           </div>
-                          <div className="w-[70px] flex items-center justify-between px-2">
+                          <div className="w-[70px] flex items-center justify-between px-2 border border-[#B1B1B1] rounded-lg">
                             <span className="font-medium">{startPeriod}</span>
 
                             <div className="flex flex-col items-center justify-center ml-1">
@@ -616,7 +764,6 @@ export default function LabelEditor() {
                               </button>
                             </div>
                           </div>
-
                         </div>
                       </div>
                       <div>
@@ -625,7 +772,7 @@ export default function LabelEditor() {
                           <div className="flex-1">
                             <s-text-field value="11:00" />
                           </div>
-                          <div className="w-[70px] flex items-center justify-between px-2">
+                          <div className="w-[70px] flex items-center justify-between px-2 border border-[#B1B1B1] rounded-lg">
                             <span className="font-medium">{startPeriod}</span>
 
                             <div className="flex flex-col items-center justify-center ml-1">
@@ -753,7 +900,7 @@ export default function LabelEditor() {
                     <s-icon
                       type={previewPage === "collection" ? "collection" : "product"}
                     />
-                    <span className="text-sm">
+                    <span className="text-[12px]">
                       {previewPage === "collection"
                         ? "Collection page"
                         : "Product page"}
@@ -837,8 +984,26 @@ export default function LabelEditor() {
                             >
                               {labelType === 'shape' ? (
                                 <div className="flex items-center justify-center w-full h-full" style={{ color: textColor }}>
-                                  <span className={`${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'} font-bold whitespace-nowrap text-center leading-tight`}>
-                                    👔 Nike vendor
+                                  <span
+                                    className={`
+                                      ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                      font-bold
+                                      text-center
+                                      break-words
+                                      overflow-hidden
+                                    `}
+                                    style={{
+                                      maxWidth: '100%',
+                                      maxHeight: '100%',
+                                      lineHeight: '1.2',
+                                      display: '-webkit-box',
+                                      WebkitLineClamp: 2,
+                                      WebkitBoxOrient: 'vertical',
+                                      wordBreak: 'break-word',
+                                      ...parseCustomCss(customCss),
+                                    }}
+                                  >
+                                    {labelText}
                                   </span>
                                 </div>
                               ) : (
@@ -915,8 +1080,26 @@ export default function LabelEditor() {
                         >
                           {labelType === 'shape' ? (
                             <div style={{ color: textColor }}>
-                              <span className="text-[12px] font-bold">
-                                👔 Nike vendor
+                              <span
+                                className={`
+                                      ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                      font-bold
+                                      text-center
+                                      break-words
+                                      overflow-hidden
+                                    `}
+                                style={{
+                                  maxWidth: '100%',
+                                  maxHeight: '100%',
+                                  lineHeight: '1.2',
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  wordBreak: 'break-word',
+                                  ...parseCustomCss(customCss),
+                                }}
+                              >
+                                {labelText}
                               </span>
                             </div>
                           ) : (

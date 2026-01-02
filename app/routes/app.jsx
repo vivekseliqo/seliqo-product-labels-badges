@@ -17,7 +17,7 @@ export default function App() {
     <AppProvider embedded apiKey={apiKey}>
       <s-app-nav>
         <s-link href="/app/labels">Labels</s-link>
-        <s-link href="/app/badge">Badge</s-link>
+        <s-link href="/app/badge">Badges</s-link>
         <s-link href="/app/badge-group">Badges Group</s-link>
         <s-link href="/app/trust-badge">Trust badge</s-link>
         <s-link href="/app/banners">Banners</s-link>

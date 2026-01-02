@@ -15,7 +15,7 @@ export default function Labels() {
           variant="primary"
           commandFor="create-label-modal"
           command="--show"
-          onClick={() => navigate('/app/label-editor')}
+          onClick={() => navigate('/app/label-editor', { state: { type: 'labels' } })}
         >
           Create labels
         </s-button>
@@ -50,7 +50,7 @@ export default function Labels() {
                   variant="primary"
                   commandFor="create-label-modal"
                   command="--show"
-                  onClick={() => navigate('/app/label-editor')}
+                  onClick={() => navigate('/app/label-editor', { state: { type: 'labels' } })}
                 >
                   Create label
                 </s-button>

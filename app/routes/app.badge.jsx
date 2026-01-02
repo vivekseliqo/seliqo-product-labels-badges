@@ -57,7 +57,7 @@ export default function Badge() {
     <s-page heading="Badge">
       <s-button slot="secondary-actions">Label</s-button>
       <s-button slot="secondary-actions">Label</s-button>
-      <s-button slot="primary-action" variant="primary" onClick={() => navigate('/app/label-editor')}>Create badge</s-button>
+      <s-button slot="primary-action" variant="primary" onClick={() => navigate('/app/label-editor', { state: { type: 'badges' } })}>Create badge</s-button>
       <div className="m-4 md:m-0">
         <p className="font-semibold text-[18px] pb-2 pt-5">Badges</p>
         <div className="pb-4">
@@ -75,7 +75,7 @@ export default function Badge() {
               <p className="pb-3">
                 Create your first badge to showcase offers, trust signals, or special highlights and improve product visibility.
               </p>
-              <s-button variant="primary" onClick={() => navigate('/app/label-editor')}>
+              <s-button variant="primary" onClick={() => navigate('/app/label-editor', { state: { type: 'badges' } })}>
                 Create Badge
               </s-button>
             </div>

@@ -67,7 +67,7 @@ export default function TrustBadge() {
     <s-page heading="Trust Badge">
       <s-button slot="secondary-actions">Label</s-button>
       <s-button slot="secondary-actions">Label</s-button>
-      <s-button slot="primary-action" variant="primary" onClick={() => navigate('/app/label-editor')}>Create trust badge</s-button>
+      <s-button slot="primary-action" variant="primary" onClick={() => navigate('/app/label-editor', { state: { type: 'trustBadges' } })}>Create trust badge</s-button>
       <div className="m-4 md:m-0">
         <p className="font-semibold text-[18px] pb-2 pt-5">Trust badges</p>
         <div className="pb-4">
@@ -85,7 +85,7 @@ export default function TrustBadge() {
               <p className="pb-3">
                 Create your first trust badge to highlight secure payments, guarantees, and reliability, helping shoppers feel confident about their purchase.
               </p>
-              <s-button variant="primary" onClick={() => navigate('/app/label-editor')}>
+              <s-button variant="primary" onClick={() => navigate('/app/label-editor', { state: { type: 'trustBadges' } })}>
                 Create trust badge
               </s-button>
             </div>
