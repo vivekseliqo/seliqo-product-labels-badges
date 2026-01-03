@@ -29,7 +29,7 @@ import Edit from "../images/edit.png";
 import MenuHorizontal from "../images/menu_horizontal.png";
 
 export default function Banners() {
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   const badges = [
     Label1, Label2, Label3, Label4, Label5,
     Label6, Label7, Label8, Label9, Label10,
@@ -58,8 +58,6 @@ export default function Banners() {
 
   return (
     <s-page heading="Labels">
-      <s-button slot="secondary-actions">Label</s-button>
-      <s-button slot="secondary-actions">Label</s-button>
       <s-button slot="primary-action" variant="primary" onClick={() => navigate('/app/label-editor', { state: { type: 'banner' } })}>
         Create banners
       </s-button>

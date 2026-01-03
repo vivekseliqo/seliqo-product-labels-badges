@@ -11,19 +11,14 @@ export default function Index() {
 
   return (
     <s-page heading="Dashboard">
-      <s-button slot="secondary-actions">Label</s-button>
-      <s-button slot="secondary-actions">Label</s-button>
       <div className="m-4 md:m-0 border rounded-xl bg-white p-4 !my-4">
         <s-card>
           <div className="space-y-3">
-            <div className="flex justify-between items-start">
-              <div>
-                <div className="pb-2">
-                  <s-text type="strong">Setup guide</s-text>
-                </div>
-                <s-paragraph>Let’s get your app ready</s-paragraph>
+            <div>
+              <div className="pb-2">
+                <s-text type="strong">Setup guide</s-text>
               </div>
-              <s-icon type="menu-horizontal" />
+              <s-paragraph>Let’s get your app ready</s-paragraph>
             </div>
 
             <div className="pb-3">
@@ -39,32 +34,6 @@ export default function Index() {
               </p>
             </div>
 
-            <s-box
-              padding="base"
-              background="strong"
-              borderRadius="base"
-            >
-              <div className="flex gap-2 items-start">
-                <s-icon type="check-circle-filled" />
-                <div className="space-y-1">
-                  <div className="pb-2">
-                    <s-text type="strong">
-                      Upload videos
-                    </s-text>
-                  </div>
-                  <s-text variant="bodySm">
-                    Upload videos from your computer or connect your Instagram account to import content.
-                  </s-text>
-
-                  <div className="flex gap-2 pt-2">
-                    <s-button size="slim">Upload video</s-button>
-                    <s-button size="slim" variant="secondary">
-                      Import from Instagram
-                    </s-button>
-                  </div>
-                </div>
-              </div>
-            </s-box>
             <s-button
               id="open-enable-app-modal"
               commandFor="enable-app-modal"

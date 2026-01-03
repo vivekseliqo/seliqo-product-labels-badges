@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import productFrame from '../images/product_frame.png'
 import statusActivation from '../images/status_activation.png'
@@ -8,11 +8,11 @@ import rectangleRibbonShape from '../images/rectangle_ribbon_shape.png'
 import rectangleShape from '../images/rectangle_shape.png'
 import starShape from '../images/star_shape.png'
 import roundedStarShape from '../images/rounded_star_shape.png'
-import Label1 from '../images/label_1.png'
-import Label2 from '../images/label_2.png'
-import Label3 from '../images/label_3.png'
-import Label4 from '../images/label_4.png'
-import Label5 from '../images/label_5.png'
+// import Label1 from '../images/label_1.png'
+// import Label2 from '../images/label_2.png'
+// import Label3 from '../images/label_3.png'
+// import Label4 from '../images/label_4.png'
+// import Label5 from '../images/label_5.png'
 import Label6 from '../images/label_6.png'
 import Label7 from '../images/label_7.png'
 import Label8 from '../images/label_8.png'
@@ -69,6 +69,7 @@ import TrustBadge33 from '../images/trust_badge_33.png'
 import TrustBadge34 from '../images/trust_badge_34.png'
 import TrustBadge35 from '../images/trust_badge_35.png'
 import Blank from '../images/blank.png'
+import EmojiPicker from "emoji-picker-react";
 
 const positions = [
   "top-left",
@@ -94,7 +95,6 @@ const shapeImages = {
 export default function LabelEditor() {
   const location = useLocation();
   const { type } = location.state || { type: 'labels' };
-  console.log(type, 'type');
   const [active, setActive] = useState('desktop');
   const [open, setOpen] = useState(true);
   const [designOpen, setDesignOpen] = useState(true);
@@ -106,36 +106,73 @@ export default function LabelEditor() {
   const [textColor, setTextColor] = useState('#ffffff');
   const [shape, setShape] = useState('rect');
   const [labelType, setLabelType] = useState(type === 'labels' ? 'shape' : 'image');
-  const [selectedImageUrl, setSelectedImageUrl] = useState(type === 'badges' ? Label1 : TrustBadge1);
+  const [selectedImageUrl, setSelectedImageUrl] = useState(type === 'badges' ? Label6 : TrustBadge1);
   const [previewPage, setPreviewPage] = useState("collection");
   const [productAlign, setProductAlign] = useState("left");
   const [selectedDropdown, setSelectedDropdown] = useState("above-title");
-  const [badgeWidth, setBadgeWidth] = useState(110);
-  const [badgeHeight, setBadgeHeight] = useState(45);
+  const [badgeWidth, setBadgeWidth] = useState(90);
+  const [badgeHeight, setBadgeHeight] = useState(35);
   const [badgeRadius, setBadgeRadius] = useState(0);
   const [badgeOpacity, setBadgeOpacity] = useState(100);
   const [badgeMargin, setBadgeMargin] = useState(0);
   const [badgePadding, setBadgePadding] = useState(0);
-  const [labelText, setLabelText] = useState("👔 Nike vendor");
+  const [labelText, setLabelText] = useState("👔Nike vendor");
   const [enableCustomCss, setEnableCustomCss] = useState(false);
   const [customCss, setCustomCss] = useState('');
+  const [openVariableMenu, setOpenVariableMenu] = useState(false);
+  const [openFontsMenu, setOpenFontsMenu] = useState(false);
+  const [openAlignMenu, setOpenAlignMenu] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+  const [chosenEmoji, setChosenEmoji] = useState(null);
+  const [bold, setBold] = useState(false);
+  const [italic, setItalic] = useState(false);
+  const [underline, setUnderline] = useState(false);
+  const [alignment, setAlignment] = useState("left");
+  const [font, setFont] = useState("Poppins");
+  const menuRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  const style = {
+    fontWeight: bold ? "bold" : "normal",
+    fontStyle: italic ? "italic" : "normal",
+    textDecoration: underline ? "underline" : "none",
+    textAlign: alignment,
+    fontFamily: font,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+    wordBreak: "break-word",
+    lineHeight: 1.2,
+  };
 
   useEffect(() => {
-    // scrollbar remove
-    document.body.style.overflow = "hidden";
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenAlignMenu(false);
+        setOpenVariableMenu(false);
+        setOpenFontsMenu(false);
+        setShowPicker(false);
+      }
+    }
 
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      // page leave karte time wapas normal
-      document.body.style.overflow = "";
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
+  const handleEmojiClick = (emojiData) => {
+    setChosenEmoji(emojiData.emoji);
+    setShowPicker(false);
+  };
+
   const readymadeImages = [
-    { id: 'free', url: Label1 },
-    { id: 'special', url: Label2 },
-    { id: 'offer', url: Label3 },
-    { id: 'sale', url: Label4 },
-    { id: 'great', url: Label5 },
+    // { id: 'free', url: Label1 },
+    // { id: 'special', url: Label2 },
+    // { id: 'offer', url: Label3 },
+    // { id: 'sale', url: Label4 },
+    // { id: 'great', url: Label5 },
     { id: 'label6', url: Label6 },
     { id: 'label7', url: Label7 },
     { id: 'label8', url: Label8 },
@@ -216,17 +253,17 @@ export default function LabelEditor() {
 
   const getPositionClasses = (pos) => {
     const map = {
-      "top-left": "top-3 left-3",
-      "top-center": "top-3 left-1/2 -translate-x-1/2",
-      "top-right": "top-3 right-3",
-      "middle-left": "top-1/2 left-3 -translate-y-1/2",
+      "top-left": "top-0 left-0",
+      "top-center": "top-0 left-1/2 -translate-x-1/2",
+      "top-right": "top-0 right-0",
+      "middle-left": "top-1/2 left-0 -translate-y-1/2",
       "center": "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
       "middle-right": "top-1/2 right-3 -translate-y-1/2",
-      "bottom-left": "bottom-3 left-3",
-      "bottom-center": "bottom-3 left-1/2 -translate-x-1/2",
-      "bottom-right": "bottom-3 right-3",
+      "bottom-left": "bottom-0 left-0",
+      "bottom-center": "bottom-0 left-1/2 -translate-x-1/2",
+      "bottom-right": "bottom-0 right-0",
     };
-    return map[pos] || "top-3 left-3";
+    return map[pos] || "top-0 left-0";
   };
 
   const getProductLabelAlign = () => {
@@ -284,7 +321,7 @@ export default function LabelEditor() {
       <div className="flex flex-wrap bg-white border rounded-xl gap-5 p-3 md:p-5 m-4 md:m-0">
 
         {/* LEFT PANEL */}
-        <div className="overflow-y-auto h-[85vh]" style={{ scrollbarWidth: 'thin' }}>
+        <div>
           <div className="w-full md:w-[360px] overflow-y-auto border rounded-xl">
             <p className='p-3 font-bold'>{type === 'badgesGroup' ? 'Badge group editor' : 'Label editor'}</p>
             <div className="overflow-hidden border-b">
@@ -328,7 +365,7 @@ export default function LabelEditor() {
                         </div>
                       ))}
                     </div>
-                    : <div className='border rounded-lg'>
+                    : <div className='border rounded-lg mb-3'>
                       <div className="flex gap-1 mb-4 border-b p-2">
                         {type === 'labels' && <button
                           onClick={() => setLabelType('shape')}
@@ -405,120 +442,286 @@ export default function LabelEditor() {
                       )}
                     </div>}
 
-                  <div className='my-3'><s-divider /></div>
-                  <div className='mb-3'>
-                    <p className='mb-1'>Label text</p>
-                    <s-text-field
-                      placeholder="Enter label text"
-                      value={labelText}
-                      onInput={(e) => setLabelText(e.target.value)}
-                    />
-                    <p className='mb-1 mt-3'>If vendor not exists on selected product</p>
-                    <s-text-field
-                      placeholder="Hide label"
-                    />
-                  </div>
-                  <div className='mb-3'><s-divider /></div>
-                  <p className='font-bold mb-3'>Color fill</p>
+                  {labelType === 'shape' &&
+                    <div>
+                      <div className='my-3'><s-divider /></div>
+                      <div className='mb-3'>
+                        <p className='mb-1 font-bold'>Label text</p>
+                        <div className='border rounded-lg'>
+                          <div className='flex gap-[6px] border-b p-2 bg-[#FAFAFA] items-center'>
+                            <button onClick={() => setBold((prev) => !prev)}><s-icon type='text-bold' /></button>
+                            <button onClick={() => setItalic((prev) => !prev)}><s-icon type='text-italic' /></button>
+                            <button onClick={() => setUnderline((prev) => !prev)}><s-icon type='text-underline' /></button>
+                            <div ref={menuRef} className="relative inline-block">
+                              <button
+                                onClick={() => setOpenAlignMenu((prev) => !prev)}
+                                className="cursor-pointer text-[12px] flex items-center"
+                              >
+                                <s-icon type="text-align-left" /> <s-icon type="caret-down" />
+                              </button>
 
-                  <div className="flex mb-4">
-                    <div className="inline-flex border border-gray-300 rounded-lg bg-white overflow-hidden">
-                      <button
-                        onClick={() => setFillType("solid")}
-                        className={`px-3 py-1 text-[12px] font-medium transition
+                              {openAlignMenu && (
+                                <div
+                                  style={{ scrollbarWidth: "thin" }}
+                                  className="absolute top-[110%] left-[-30px] w-[100px] h-[120px] overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-[0_4px_14px_rgba(0,0,0,0.12)] z-[1000]"
+                                >
+                                  {[
+                                    { align: "text-align-left", label: "Left", icon: "text-align-left" },
+                                    { align: "text-align-center", label: "Center", icon: "text-align-center" },
+                                    { align: "text-align-right", label: "Right", icon: "text-align-right" },
+                                  ].map((item, index) => (
+                                    <div
+                                      key={index}
+                                      onClick={() => {
+                                        setOpenAlignMenu(false);
+                                        // yahan alignment apply karne ka logic add kar sakte ho
+                                      }}
+                                      style={{ padding: "5px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px" }}
+                                      onMouseEnter={(e) => (e.currentTarget.style.background = "#f3f3f3")}
+                                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                                    >
+                                      <s-icon type={item.icon} />
+                                      <span style={{ fontSize: "12px" }}>{item.label}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <div ref={menuRef} className="relative inline-block">
+                              <button
+                                onClick={() => setOpenFontsMenu((prev) => !prev)}
+                                className="cursor-pointer text-[12px] flex items-center"
+                              >
+                                Poppins <s-icon type='caret-down' />
+                              </button>
+
+                              {openFontsMenu && (
+                                <div
+                                  style={{ scrollbarWidth: 'thin' }}
+                                  className="absolute top-[110%] left-[-30px] w-[150px] h-[250px] overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-[0_4px_14px_rgba(0,0,0,0.12)] z-[1000]"
+                                >
+                                  {[
+                                    { fontFamily: "Inter" },
+                                    { fontFamily: "Roboto" },
+                                    { fontFamily: "Helvetica Neue" },
+                                    { fontFamily: "Arial" },
+                                    { fontFamily: "Montserrat" },
+                                    { fontFamily: "Lato" },
+                                    { fontFamily: "Open Sans" },
+                                    { fontFamily: "Poppins" },
+                                    { fontFamily: "Source Sans Pro" },
+                                    { fontFamily: "Nunito" },
+                                    { fontFamily: "Ubuntu" },
+                                    { fontFamily: "Raleway" },
+                                    { fontFamily: "Merriweather" },
+                                    { fontFamily: "Playfair Display" },
+                                    { fontFamily: "Roboto Slab" },
+                                    { fontFamily: "Oswald" },
+                                    { fontFamily: "Titillium Web" },
+                                    { fontFamily: "Fira Sans" },
+                                    { fontFamily: "Quicksand" },
+                                    { fontFamily: "Cabin" },
+                                  ].map((item, index) => (
+                                    <div
+                                      key={index}
+                                      onClick={() => setOpenFontsMenu(false)}
+                                      style={{ padding: "5px 10px", cursor: "pointer", fontFamily: item.fontFamily }}
+                                      onMouseEnter={(e) => (e.currentTarget.style.background = "#f3f3f3")}
+                                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                                    >
+                                      {item.fontFamily}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                            </div>
+                            <div ref={menuRef} className="relative inline-block">
+                              <button
+                                onClick={() => setShowPicker((prev) => !prev)}
+                              >
+                                <s-icon type="smiley-happy" />
+                              </button>
+
+                              {showPicker && (
+                                <div
+                                  className="absolute top-[110%] left-[-220px] z-[1000]"
+                                >
+                                  <EmojiPicker onEmojiClick={handleEmojiClick} />
+                                </div>
+                              )}
+
+                              {chosenEmoji && <span style={{ marginLeft: "8px" }}>{chosenEmoji}</span>}
+                            </div>
+                            <div ref={menuRef} className="relative inline-block">
+                              <button
+                                onClick={() => setOpenVariableMenu((prev) => !prev)}
+                                className="px-2 py-[2px] rounded-md border border-gray-300 bg-white cursor-pointer text-[12px]"
+                              >
+                                Add variable
+                              </button>
+
+                              {openVariableMenu && (
+                                <div style={{ scrollbarWidth: 'thin' }}
+                                  className="absolute top-[110%] left-[-30px] w-[150px] h-[250px] overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-[0_4px_14px_rgba(0,0,0,0.12)] z-[1000]"
+                                >
+                                  {[
+                                    { title: "Product vendor", example: "ABC vendor" },
+                                    { title: "Percentage discount", example: "10% off" },
+                                    { title: "Amount discount", example: "$10 off" },
+                                    { title: "Price", example: "Only $10" },
+                                    { title: "Rating", example: "5 star" },
+                                    { title: "Number of review", example: "500 reviews" },
+                                    { title: "Remaining stock", example: "only 5 left" },
+                                    { title: "Product metafield", example: "100% pure" },
+                                  ].map((item, index) => (
+                                    <div
+                                      key={index}
+                                      onClick={() => {
+                                        setOpenVariableMenu(false);
+                                      }}
+                                      style={{
+                                        padding: "5px 10px",
+                                        cursor: "pointer",
+                                      }}
+                                      onMouseEnter={(e) =>
+                                        (e.currentTarget.style.background = "#f3f3f3")
+                                      }
+                                      onMouseLeave={(e) =>
+                                        (e.currentTarget.style.background = "transparent")
+                                      }
+                                    >
+                                      <div style={{ fontWeight: 500, fontSize: "12px" }}>
+                                        {item.title}
+                                      </div>
+                                      <div style={{ fontSize: "11px", color: "#6d6d6d" }}>
+                                        Example: {item.example}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <textarea
+                              ref={textareaRef}
+                              value={labelText}
+                              onChange={(e) => setLabelText(e.target.value)}
+                              rows="3"
+                              cols="40"
+                              className="outline-none p-2"
+                            ></textarea>
+                          </div>
+                        </div>
+                        <div className='mt-3'>
+                          <s-clickable-chip>Note: If vendor not exists on selected product</s-clickable-chip>
+                        </div>
+                      </div>
+
+                      <div className='mb-3'><s-divider /></div>
+                      <p className='font-bold mb-3'>Color fill</p>
+
+                      <div className="flex mb-4">
+                        <div className="inline-flex border border-gray-300 rounded-lg bg-white overflow-hidden">
+                          <button
+                            onClick={() => setFillType("solid")}
+                            className={`px-3 py-1 text-[12px] font-medium transition
                             ${fillType === "solid"
-                            ? "bg-[#EBEBEB] text-black"
-                            : "bg-white text-gray-700"
-                          }`}
-                      >
-                        Solid fill
-                      </button>
+                                ? "bg-[#EBEBEB] text-black"
+                                : "bg-white text-gray-700"
+                              }`}
+                          >
+                            Solid fill
+                          </button>
 
-                      <button
-                        onClick={() => setFillType("gradient")}
-                        className={`px-3 py-1 text-[12px] font-medium transition
+                          <button
+                            onClick={() => setFillType("gradient")}
+                            className={`px-3 py-1 text-[12px] font-medium transition
                             ${fillType === "gradient"
-                            ? "bg-[#EBEBEB] text-black"
-                            : "bg-white text-gray-700"
-                          }`}
-                      >
-                        Gradient fill
-                      </button>
+                                ? "bg-[#EBEBEB] text-black"
+                                : "bg-white text-gray-700"
+                              }`}
+                          >
+                            Gradient fill
+                          </button>
+                        </div>
+                      </div>
+
+                      {fillType === "solid" && (
+                        <>
+                          <div className="flex items-center gap-3 mb-3">
+                            <input
+                              type="color"
+                              value={color1}
+                              onChange={(e) => setColor1(e.target.value)}
+                              className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                            />
+                            <div>
+                              <p className="text-[13px] font-medium">Background color</p>
+                              <p className="text-[12px] uppercase text-gray-500">{color1}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 mb-4">
+                            <input
+                              type="color"
+                              value={textColor}
+                              onChange={(e) => setTextColor(e.target.value)}
+                              className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                            />
+                            <div>
+                              <p className="text-[13px] font-medium">Text color</p>
+                              <p className="text-[12px] uppercase text-gray-500">{textColor}</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {fillType === "gradient" && (
+                        <>
+                          <div className="flex items-center gap-3 mb-3">
+                            <input
+                              type="color"
+                              value={color1}
+                              onChange={(e) => setColor1(e.target.value)}
+                              className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                            />
+                            <div>
+                              <p className="text-[13px] font-medium">Start background</p>
+                              <p className="text-[12px] uppercase text-gray-500">{color1}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 mb-3">
+                            <input
+                              type="color"
+                              value={color2}
+                              onChange={(e) => setColor2(e.target.value)}
+                              className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                            />
+                            <div>
+                              <p className="text-[13px] font-medium">End background</p>
+                              <p className="text-[12px] uppercase text-gray-500">{color2}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 mb-4">
+                            <input
+                              type="color"
+                              value={textColor}
+                              onChange={(e) => setTextColor(e.target.value)}
+                              className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                            />
+                            <div>
+                              <p className="text-[13px] font-medium">Text color</p>
+                              <p className="text-[12px] uppercase text-gray-500">{textColor}</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
-                  </div>
-
-                  {fillType === "solid" && (
-                    <>
-                      <div className="flex items-center gap-3 mb-3">
-                        <input
-                          type="color"
-                          value={color1}
-                          onChange={(e) => setColor1(e.target.value)}
-                          className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
-                        />
-                        <div>
-                          <p className="text-[13px] font-medium">Background color</p>
-                          <p className="text-[12px] uppercase text-gray-500">{color1}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3 mb-4">
-                        <input
-                          type="color"
-                          value={textColor}
-                          onChange={(e) => setTextColor(e.target.value)}
-                          className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
-                        />
-                        <div>
-                          <p className="text-[13px] font-medium">Text color</p>
-                          <p className="text-[12px] uppercase text-gray-500">{textColor}</p>
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  {fillType === "gradient" && (
-                    <>
-                      <div className="flex items-center gap-3 mb-3">
-                        <input
-                          type="color"
-                          value={color1}
-                          onChange={(e) => setColor1(e.target.value)}
-                          className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
-                        />
-                        <div>
-                          <p className="text-[13px] font-medium">Start background</p>
-                          <p className="text-[12px] uppercase text-gray-500">{color1}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3 mb-3">
-                        <input
-                          type="color"
-                          value={color2}
-                          onChange={(e) => setColor2(e.target.value)}
-                          className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
-                        />
-                        <div>
-                          <p className="text-[13px] font-medium">End background</p>
-                          <p className="text-[12px] uppercase text-gray-500">{color2}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3 mb-4">
-                        <input
-                          type="color"
-                          value={textColor}
-                          onChange={(e) => setTextColor(e.target.value)}
-                          className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
-                        />
-                        <div>
-                          <p className="text-[13px] font-medium">Text color</p>
-                          <p className="text-[12px] uppercase text-gray-500">{textColor}</p>
-                        </div>
-                      </div>
-                    </>
-                  )}
+                  }
 
                   <div className='mb-3'><s-divider /></div>
                   <p className='font-bold mb-2'>Interaction setting</p>
@@ -621,93 +824,97 @@ export default function LabelEditor() {
                       </div>
                     )}
                   </div>
-                  <div className='mb-3'><s-divider /></div>
-                  <div className='mb-3'>
-                    <p className="font-semibold mb-4">Style setting</p>
+                  {labelType === 'shape' &&
+                    <>
+                      <div className='mb-3'><s-divider /></div>
+                      <div className='mb-3'>
+                        <p className="font-semibold mb-4">Style setting</p>
 
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                      <div>
-                        <p className="mb-1">Badge width</p>
-                        <s-number-field
-                          value={badgeWidth}
-                          suffix="Px"
-                          onChange={(e) => setBadgeWidth(Number(e.target.value))}
-                        />
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                          <div>
+                            <p className="mb-1">Badge width</p>
+                            <s-number-field
+                              value={badgeWidth}
+                              suffix="Px"
+                              onChange={(e) => setBadgeWidth(Number(e.target.value))}
+                            />
 
+                          </div>
+
+                          <div>
+                            <p className="mb-1">Badge height</p>
+                            <s-number-field
+                              value={badgeHeight}
+                              suffix="Px"
+                              onChange={(e) => setBadgeHeight(Number(e.target.value))}
+                            />
+
+                          </div>
+
+                          <div>
+                            <p className="mb-1">Rounded corner</p>
+                            <s-number-field
+                              value={badgeRadius}
+                              suffix="Px"
+                              onChange={(e) => setBadgeRadius(Number(e.target.value))}
+                            />
+
+                          </div>
+
+                          <div>
+                            <p className="mb-1">Badge opacity</p>
+                            <s-number-field
+                              value={badgeOpacity}
+                              suffix="%"
+                              onChange={(e) => setBadgeOpacity(Number(e.target.value))}
+                            />
+
+                          </div>
+
+                          <div>
+                            <p className="mb-1">Margin</p>
+                            <s-number-field
+                              value={badgeMargin}
+                              suffix="Px"
+                              onChange={(e) => setBadgeMargin(Number(e.target.value))}
+                            />
+
+                          </div>
+
+                          <div>
+                            <p className="mb-1">Padding</p>
+                            <s-number-field
+                              value={badgePadding}
+                              suffix="Px"
+                              onChange={(e) => setBadgePadding(Number(e.target.value))}
+                            />
+
+                          </div>
+                        </div>
                       </div>
-
-                      <div>
-                        <p className="mb-1">Badge height</p>
-                        <s-number-field
-                          value={badgeHeight}
-                          suffix="Px"
-                          onChange={(e) => setBadgeHeight(Number(e.target.value))}
+                      <div className='mb-3'><s-divider /></div>
+                      <div className='mb-3'>
+                        <p className="font-semibold mb-2">Custom</p>
+                        <s-checkbox
+                          label="Custom CSS"
+                          checked={enableCustomCss}
+                          onChange={(e) => setEnableCustomCss(e.target.checked)}
                         />
-
-                      </div>
-
-                      <div>
-                        <p className="mb-1">Rounded corner</p>
-                        <s-number-field
-                          value={badgeRadius}
-                          suffix="Px"
-                          onChange={(e) => setBadgeRadius(Number(e.target.value))}
+                        <s-text-area
+                          value={customCss}
+                          placeholder="Enter your custom CSS here"
+                          rows={4}
+                          disabled={!enableCustomCss}
+                          onInput={(e) => setCustomCss(e.target.value)}
                         />
-
+                        {enableCustomCss && (
+                          <p className="text-[11px] text-gray-500 mt-1">
+                            Example: font-size:14px; text-transform:uppercase;
+                          </p>
+                        )}
                       </div>
-
-                      <div>
-                        <p className="mb-1">Badge opacity</p>
-                        <s-number-field
-                          value={badgeOpacity}
-                          suffix="%"
-                          onChange={(e) => setBadgeOpacity(Number(e.target.value))}
-                        />
-
-                      </div>
-
-                      <div>
-                        <p className="mb-1">Margin</p>
-                        <s-number-field
-                          value={badgeMargin}
-                          suffix="Px"
-                          onChange={(e) => setBadgeMargin(Number(e.target.value))}
-                        />
-
-                      </div>
-
-                      <div>
-                        <p className="mb-1">Padding</p>
-                        <s-number-field
-                          value={badgePadding}
-                          suffix="Px"
-                          onChange={(e) => setBadgePadding(Number(e.target.value))}
-                        />
-
-                      </div>
-                    </div>
-                  </div>
-                  <div className='mb-3'><s-divider /></div>
-                  <div className='mb-3'>
-                    <p className="font-semibold mb-2">Custom</p>
-                    <s-checkbox
-                      label="Custom CSS"
-                      checked={enableCustomCss}
-                      onChange={(e) => setEnableCustomCss(e.target.checked)}
-                    />
-                    <s-text-area
-                      value={customCss}
-                      placeholder="Enter your custom CSS here"
-                      rows={4}
-                      disabled={!enableCustomCss}
-                      onInput={(e) => setCustomCss(e.target.value)}
-                    />
-                    {enableCustomCss && (
-                      <p className="text-[11px] text-gray-500 mt-1">
-                        Example: font-size:14px; text-transform:uppercase;
-                      </p>
-                    )}
-                  </div>
+                    </>
+                  }
                   <div className='mb-3'><s-divider /></div>
                   <div className='mb-3'>
                     <p className="font-semibold mb-2">Visibility date </p>
@@ -950,7 +1157,7 @@ export default function LabelEditor() {
                         <div key={item} className="flex-shrink-0">
                           <div className={`relative bg-[#E3EDFB] rounded-lg flex items-center justify-center overflow-hidden transition-all`}>
                             <div
-                              className={`absolute z-10 flex items-center justify-center transition-all duration-300 ${getPositionClasses(selected)}`}
+                              className={`absolute z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
                               style={{
                                 width: `${badgeWidth}px`,
                                 height: `${badgeHeight}px`,
@@ -987,7 +1194,6 @@ export default function LabelEditor() {
                                   <span
                                     className={`
                                       ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
-                                      font-bold
                                       text-center
                                       break-words
                                       overflow-hidden
@@ -1001,6 +1207,7 @@ export default function LabelEditor() {
                                       WebkitBoxOrient: 'vertical',
                                       wordBreak: 'break-word',
                                       ...parseCustomCss(customCss),
+                                      ...style
                                     }}
                                   >
                                     {labelText}
@@ -1048,7 +1255,7 @@ export default function LabelEditor() {
                       <p className="text-lg font-semibold">$16.00</p>
                       <div className={`flex ${getProductLabelAlign()} mb-1`}>
                         <div
-                          className="flex items-center justify-center"
+                          className="flex items-center"
                           style={{
                             width: `${badgeWidth}px`,
                             height: `${badgeHeight}px`,
@@ -1083,7 +1290,6 @@ export default function LabelEditor() {
                               <span
                                 className={`
                                       ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
-                                      font-bold
                                       text-center
                                       break-words
                                       overflow-hidden

@@ -65,8 +65,6 @@ export default function TrustBadge() {
 
   return (
     <s-page heading="Trust Badge">
-      <s-button slot="secondary-actions">Label</s-button>
-      <s-button slot="secondary-actions">Label</s-button>
       <s-button slot="primary-action" variant="primary" onClick={() => navigate('/app/label-editor', { state: { type: 'trustBadges' } })}>Create trust badge</s-button>
       <div className="m-4 md:m-0">
         <p className="font-semibold text-[18px] pb-2 pt-5">Trust badges</p>
