@@ -18,7 +18,6 @@ import Label7 from '../images/label_7.png'
 import Label8 from '../images/label_8.png'
 import Label9 from '../images/label_9.png'
 import Label10 from '../images/label_10.png'
-import Label11 from '../images/label_11.png'
 import Label12 from '../images/label_12.png'
 import Label13 from '../images/label_13.png'
 import Label14 from '../images/label_14.png'
@@ -110,6 +109,7 @@ export default function LabelEditor() {
   const [previewPage, setPreviewPage] = useState("collection");
   const [productAlign, setProductAlign] = useState("left");
   const [selectedDropdown, setSelectedDropdown] = useState("above-title");
+  const [selectedDisplayType, setSelectedDisplayType] = useState('horizontal');
   const [badgeWidth, setBadgeWidth] = useState(90);
   const [badgeHeight, setBadgeHeight] = useState(35);
   const [badgeRadius, setBadgeRadius] = useState(0);
@@ -120,24 +120,40 @@ export default function LabelEditor() {
   const [enableCustomCss, setEnableCustomCss] = useState(false);
   const [customCss, setCustomCss] = useState('');
   const [openVariableMenu, setOpenVariableMenu] = useState(false);
+  const [fontFamily, setFontFamily] = useState("Poppins");
   const [openFontsMenu, setOpenFontsMenu] = useState(false);
   const [openAlignMenu, setOpenAlignMenu] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
-  const [chosenEmoji, setChosenEmoji] = useState(null);
   const [bold, setBold] = useState(false);
   const [italic, setItalic] = useState(false);
   const [underline, setUnderline] = useState(false);
   const [alignment, setAlignment] = useState("left");
-  const [font, setFont] = useState("Poppins");
-  const menuRef = useRef(null);
+  const [isTooltipEnabled, setIsTooltipEnabled] = useState(false);
+  const [isActionLinkEnabled, setIsActionLinkEnabled] = useState(false);
+  const [actionLinkUrl, setActionLinkUrl] = useState("");
+  const [labelTooltip, setLabelTooltip] = useState("");
+  const alignMenuRef = useRef(null);
+  const fontMenuRef = useRef(null);
+  const emojiMenuRef = useRef(null);
+  const variableMenuRef = useRef(null);
   const textareaRef = useRef(null);
+
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${fontFamily.replace(
+      " ",
+      "+"
+    )}&display=swap`;
+    document.head.appendChild(link);
+  }, [fontFamily]);
 
   const style = {
     fontWeight: bold ? "bold" : "normal",
     fontStyle: italic ? "italic" : "normal",
     textDecoration: underline ? "underline" : "none",
     textAlign: alignment,
-    fontFamily: font,
+    fontFamily: fontFamily,
     display: "-webkit-box",
     WebkitLineClamp: 2,
     WebkitBoxOrient: "vertical",
@@ -148,7 +164,16 @@ export default function LabelEditor() {
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      if (
+        alignMenuRef.current &&
+        !alignMenuRef.current.contains(event.target) &&
+        fontMenuRef.current &&
+        !fontMenuRef.current.contains(event.target) &&
+        emojiMenuRef.current &&
+        !emojiMenuRef.current.contains(event.target) &&
+        variableMenuRef.current &&
+        !variableMenuRef.current.contains(event.target)
+      ) {
         setOpenAlignMenu(false);
         setOpenVariableMenu(false);
         setOpenFontsMenu(false);
@@ -163,7 +188,13 @@ export default function LabelEditor() {
   }, []);
 
   const handleEmojiClick = (emojiData) => {
-    setChosenEmoji(emojiData.emoji);
+    setLabelText((prev) => {
+      if (!prev) {
+        return emojiData.emoji;
+      }
+      return `${prev} ${emojiData.emoji}`;
+    });
+
     setShowPicker(false);
   };
 
@@ -178,7 +209,6 @@ export default function LabelEditor() {
     { id: 'label8', url: Label8 },
     { id: 'label9', url: Label9 },
     { id: 'label10', url: Label10 },
-    { id: 'label11', url: Label11 },
     { id: 'label12', url: Label12 },
     { id: 'label13', url: Label13 },
     { id: 'label14', url: Label14 },
@@ -288,6 +318,11 @@ export default function LabelEditor() {
     { id: 'after-price', label: 'After product price', className: 'bottom-center' },
   ];
 
+  const displayTypeOptions = [
+    { id: 'horizontal', label: 'Horizontal' },
+    { id: 'vertical', label: 'Vertical' }
+  ];
+
   const parseCustomCss = (cssText) => {
     if (!enableCustomCss || !cssText) return {};
 
@@ -308,9 +343,18 @@ export default function LabelEditor() {
     <s-page heading="Seliqo Label" inlineSize="large">
       <div className="flex items-center justify-center md:justify-start gap-2 py-3">
         <div className="w-[120px] md:w-[250px]">
-          <s-text-field placeholder="Offer label" />
+          <s-text-field
+            placeholder={
+              type === 'labels'
+                ? 'Offer label'
+                : type === 'badges'
+                  ? 'Offer badge'
+                  : type === 'badgesGroup'
+                    ? 'Badge group'
+                    : ''
+            }
+          />
         </div>
-
         <div className="w-[120px] md:w-[250px]">
           <s-number-field placeholder="1" min={0} max={100} />
         </div>
@@ -318,12 +362,20 @@ export default function LabelEditor() {
         <s-badge tone="success">Active</s-badge>
       </div>
 
-      <div className="flex flex-wrap bg-white border rounded-xl gap-5 p-3 md:p-5 m-4 md:m-0">
+      <div className="flex flex-wrap bg-white border rounded-xl gap-5 p-3 md:p-5">
 
         {/* LEFT PANEL */}
         <div>
           <div className="w-full md:w-[360px] overflow-y-auto border rounded-xl">
-            <p className='p-3 font-bold'>{type === 'badgesGroup' ? 'Badge group editor' : 'Label editor'}</p>
+            <p className='p-3 font-bold'>
+              {type === 'badgesGroup'
+                ? 'Badge group editor'
+                : type === 'badges'
+                  ? 'Badge editor'
+                  : type === 'labels'
+                    ? 'Label editor'
+                    : null}
+            </p>
             <div className="overflow-hidden border-b">
               <div
                 className="bg-[#F3F3F3] flex justify-between p-4 cursor-pointer"
@@ -331,7 +383,15 @@ export default function LabelEditor() {
               >
                 <div className="flex gap-1 items-center">
                   <s-icon type="paint-brush-flat" />
-                  <b>{type === 'badgesGroup' ? 'Badge group design setting' : 'Label design setting'}</b>
+                  <b>
+                    {type === 'labels'
+                      ? 'Label design setting'
+                      : type === 'badges'
+                        ? 'Badge design setting'
+                        : type === 'badgesGroup'
+                          ? 'Badge group design setting'
+                          : ''}
+                  </b>
                 </div>
                 <div className={`transition-transform duration-300 ${designOpen ? "rotate-180" : ""}`}>
                   <s-icon type="chevron-down" />
@@ -377,7 +437,14 @@ export default function LabelEditor() {
                           onClick={() => setLabelType('image')}
                           className={`${labelType === 'image' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
                         >
-                          Readymade image label
+                          
+                          {type === 'labels'
+                            ? 'Readymade image label'
+                            : type === 'badges'
+                              ? 'Readymade image label'
+                              : type === 'badgesGroup'
+                                ? 'Readymade image badge'
+                                : ''}
                         </button>
                       </div>
 
@@ -446,13 +513,21 @@ export default function LabelEditor() {
                     <div>
                       <div className='my-3'><s-divider /></div>
                       <div className='mb-3'>
-                        <p className='mb-1 font-bold'>Label text</p>
+                        <p className='mb-1 font-bold'>
+                          {type === 'labels'
+                            ? 'Label text'
+                            : type === 'badges'
+                              ? 'Badge text'
+                              : type === 'badgesGroup'
+                                ? 'Badge text'
+                                : ''}
+                        </p>
                         <div className='border rounded-lg'>
                           <div className='flex gap-[6px] border-b p-2 bg-[#FAFAFA] items-center'>
                             <button onClick={() => setBold((prev) => !prev)}><s-icon type='text-bold' /></button>
                             <button onClick={() => setItalic((prev) => !prev)}><s-icon type='text-italic' /></button>
                             <button onClick={() => setUnderline((prev) => !prev)}><s-icon type='text-underline' /></button>
-                            <div ref={menuRef} className="relative inline-block">
+                            <div ref={alignMenuRef} className="relative inline-block">
                               <button
                                 onClick={() => setOpenAlignMenu((prev) => !prev)}
                                 className="cursor-pointer text-[12px] flex items-center"
@@ -466,15 +541,15 @@ export default function LabelEditor() {
                                   className="absolute top-[110%] left-[-30px] w-[100px] h-[120px] overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-[0_4px_14px_rgba(0,0,0,0.12)] z-[1000]"
                                 >
                                   {[
-                                    { align: "text-align-left", label: "Left", icon: "text-align-left" },
-                                    { align: "text-align-center", label: "Center", icon: "text-align-center" },
-                                    { align: "text-align-right", label: "Right", icon: "text-align-right" },
+                                    { align: "left", label: "Left", icon: "text-align-left" },
+                                    { align: "center", label: "Center", icon: "text-align-center" },
+                                    { align: "right", label: "Right", icon: "text-align-right" },
                                   ].map((item, index) => (
                                     <div
                                       key={index}
                                       onClick={() => {
+                                        setAlignment(item.align);
                                         setOpenAlignMenu(false);
-                                        // yahan alignment apply karne ka logic add kar sakte ho
                                       }}
                                       style={{ padding: "5px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px" }}
                                       onMouseEnter={(e) => (e.currentTarget.style.background = "#f3f3f3")}
@@ -487,7 +562,7 @@ export default function LabelEditor() {
                                 </div>
                               )}
                             </div>
-                            <div ref={menuRef} className="relative inline-block">
+                            <div ref={fontMenuRef} className="relative inline-block">
                               <button
                                 onClick={() => setOpenFontsMenu((prev) => !prev)}
                                 className="cursor-pointer text-[12px] flex items-center"
@@ -524,7 +599,10 @@ export default function LabelEditor() {
                                   ].map((item, index) => (
                                     <div
                                       key={index}
-                                      onClick={() => setOpenFontsMenu(false)}
+                                      onClick={() => {
+                                        setFontFamily(item.fontFamily);
+                                        setOpenFontsMenu(false);
+                                      }}
                                       style={{ padding: "5px 10px", cursor: "pointer", fontFamily: item.fontFamily }}
                                       onMouseEnter={(e) => (e.currentTarget.style.background = "#f3f3f3")}
                                       onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
@@ -536,7 +614,7 @@ export default function LabelEditor() {
                               )}
 
                             </div>
-                            <div ref={menuRef} className="relative inline-block">
+                            <div ref={emojiMenuRef} className="relative inline-block">
                               <button
                                 onClick={() => setShowPicker((prev) => !prev)}
                               >
@@ -550,10 +628,8 @@ export default function LabelEditor() {
                                   <EmojiPicker onEmojiClick={handleEmojiClick} />
                                 </div>
                               )}
-
-                              {chosenEmoji && <span style={{ marginLeft: "8px" }}>{chosenEmoji}</span>}
                             </div>
-                            <div ref={menuRef} className="relative inline-block">
+                            <div ref={variableMenuRef} className="relative inline-block">
                               <button
                                 onClick={() => setOpenVariableMenu((prev) => !prev)}
                                 className="px-2 py-[2px] rounded-md border border-gray-300 bg-white cursor-pointer text-[12px]"
@@ -578,6 +654,7 @@ export default function LabelEditor() {
                                     <div
                                       key={index}
                                       onClick={() => {
+                                        setLabelText(item.example);
                                         setOpenVariableMenu(false);
                                       }}
                                       style={{
@@ -615,7 +692,7 @@ export default function LabelEditor() {
                           </div>
                         </div>
                         <div className='mt-3'>
-                          <s-clickable-chip>Note: If vendor not exists on selected product</s-clickable-chip>
+                          <s-clickable-chip>Note: If {labelText} not exists on selected product</s-clickable-chip>
                         </div>
                       </div>
 
@@ -723,28 +800,45 @@ export default function LabelEditor() {
                     </div>
                   }
 
-                  <div className='mb-3'><s-divider /></div>
-                  <p className='font-bold mb-2'>Interaction setting</p>
-                  <div className='mb-2'>
-                    <s-checkbox
-                      label="Add action link"
-                    />
-                    <s-email-field
-                      placeholder="https://www.yourstore.com"
-                    />
-                  </div>
+                  {type !== 'badgesGroup' &&
+                    <>
+                      <div className='mb-3'><s-divider /></div>
+                      <p className='font-bold mb-2'>Interaction setting</p>
+                      <div className='mb-2'>
+                        <s-checkbox
+                          label="Add action link"
+                          checked={isActionLinkEnabled}
+                          onChange={(e) => setIsActionLinkEnabled(e.target.checked)}
+                        />
+                        {isActionLinkEnabled && (
+                          <s-email-field
+                            placeholder="https://www.yourstore.com"
+                            value={actionLinkUrl}
+                            onChange={(e) => setActionLinkUrl(e.target.value)}
+                          />
+                        )}
+                      </div>
+                      <div className='mb-3'>
+                        <s-checkbox
+                          label="Show tooltip for label"
+                          checked={isTooltipEnabled}
+                          onChange={(e) => setIsTooltipEnabled(e.target.checked)}
+                        />
+                        {isTooltipEnabled && (
+                          <s-text-field
+                            placeholder="Add tooltip message here"
+                            value={labelTooltip}
+                            onChange={(e) => setLabelTooltip(e.target.value)}
+                          />
+                        )}
+                      </div>
+                    </>
+                  }
+                  <div className='my-3'><s-divider /></div>
                   <div className='mb-3'>
-                    <s-checkbox
-                      label="Show tooltip for label"
-                    />
-                    <s-text-field
-                      placeholder="Add tooltip message here"
-                    />
-                  </div>
-                  <div className='mb-3'><s-divider /></div>
-                  <div className='mb-3'>
-                    <p className="font-semibold mb-2">Label position</p>
-
+                    <p className="font-semibold mb-2">
+                      {type === 'labels' ? 'Label position' : type === 'badges' ? 'Badge position' : type === 'badgesGroup' ? 'Badge position' : ''}
+                    </p>
                     {previewPage === "collection" ? (
                       <div className="relative bg-[#F0ECE8] p-4 rounded-xl w-[260px]">
                         <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
@@ -779,7 +873,9 @@ export default function LabelEditor() {
                     ) : (
                       <div>
                         <div className='mb-3'>
-                          <p className='mb-1'>Label to display</p>
+                          <p className='mb-1'>
+                            {type === 'labels' ? 'Label to display' : type === 'badges' ? 'Badge to display' : type === 'badgesGroup' ? 'Badge to display' : ''}
+                          </p>
                           <s-select
                             value={selectedDropdown}
                             onChange={(val) => {
@@ -789,6 +885,26 @@ export default function LabelEditor() {
                             }}
                           >
                             {labelPositionsDropdown.map((pos) => (
+                              <s-option key={pos.id} value={pos.id}>
+                                {pos.label}
+                              </s-option>
+                            ))}
+                          </s-select>
+                        </div>
+                        <div className='mb-3'>
+                          <p className='mb-1'>
+                            Display type
+                          </p>
+                          <s-select
+                            value={selectedDropdown}
+                            onChange={(val) => {
+                              
+                              setSelectedDisplayType(val);
+                              const pos = displayTypeOptions.find(p => p.id === val);
+                              if (pos) setSelected(pos.className);
+                            }}
+                          >
+                            {displayTypeOptions.map((pos) => (
                               <s-option key={pos.id} value={pos.id}>
                                 {pos.label}
                               </s-option>
@@ -900,13 +1016,12 @@ export default function LabelEditor() {
                           checked={enableCustomCss}
                           onChange={(e) => setEnableCustomCss(e.target.checked)}
                         />
-                        <s-text-area
+                        {enableCustomCss && <s-text-area
                           value={customCss}
-                          placeholder="Enter your custom CSS here"
+                          placeholder="Enter your custom css here"
                           rows={4}
-                          disabled={!enableCustomCss}
                           onInput={(e) => setCustomCss(e.target.value)}
-                        />
+                        />}
                         {enableCustomCss && (
                           <p className="text-[11px] text-gray-500 mt-1">
                             Example: font-size:14px; text-transform:uppercase;
@@ -915,100 +1030,164 @@ export default function LabelEditor() {
                       </div>
                     </>
                   }
-                  <div className='mb-3'><s-divider /></div>
-                  <div className='mb-3'>
-                    <p className="font-semibold mb-2">Visibility date </p>
-                    <div className='flex gap-3 items-center mb-2'>
-                      <s-choice-list
-                      >
-                        <s-choice value="Always visible">Always visible</s-choice>
-                      </s-choice-list>
-                      <s-choice-list
-                      >
-                        <s-choice value="Specific dates">Specific dates</s-choice>
-                      </s-choice-list>
-                    </div>
-                    <div className='mb-3'>
-                      <p className='mb-1'>Start date</p>
-                      <s-date-field defaultView="2025-09" defaultValue="2025-09-01" />
-                    </div>
-                    <div className='mb-3'>
-                      <p className='mb-1'>End date</p>
-                      <s-date-field defaultView="2025-09" defaultValue="2025-09-01" />
-                    </div>
-                    <s-checkbox
-                      label="Daily recurring timer"
-                    />
-                    <div className="grid grid-cols-2 gap-4 mt-2">
-                      <div>
-                        <p className="mb-1 font-medium">Start time</p>
-                        <div className="flex">
-                          <div className="flex-1">
-                            <s-text-field value="09:00" />
+                  {type === 'badgesGroup' &&
+                    <>
+                      <div className='mb-3'><s-divider /></div>
+                      <div className='mb-3'>
+                        <p className="font-semibold mb-4">Style setting</p>
+
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                          <div>
+                            <p className="mb-1">Gap between the badge</p>
+                            <s-number-field
+                              value={badgeWidth}
+                              suffix="Px"
+                              onChange={(e) => setBadgeWidth(Number(e.target.value))}
+                            />
+
                           </div>
-                          <div className="w-[70px] flex items-center justify-between px-2 border border-[#B1B1B1] rounded-lg">
-                            <span className="font-medium">{startPeriod}</span>
 
-                            <div className="flex flex-col items-center justify-center ml-1">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
-                                }
-                                className="h-4 flex items-center justify-center opacity-70 hover:opacity-100"
-                              >
-                                <s-icon type="chevron-up" className="w-3 h-3" />
-                              </button>
+                          <div>
+                            <p className="mb-1">Badge height</p>
+                            <s-number-field
+                              value={badgeHeight}
+                              suffix="Px"
+                              onChange={(e) => setBadgeHeight(Number(e.target.value))}
+                            />
 
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
-                                }
-                                className="h-4 flex items-center justify-center opacity-70 hover:opacity-100"
-                              >
-                                <s-icon type="chevron-down" className="w-3 h-3" />
-                              </button>
+                          </div>
+
+                          <div>
+                            <p className="mb-1">Margin</p>
+                            <s-number-field
+                              value={badgeMargin}
+                              suffix="Px"
+                              onChange={(e) => setBadgeMargin(Number(e.target.value))}
+                            />
+
+                          </div>
+                        </div>
+                      </div>
+                      <div className='mb-3'><s-divider /></div>
+                      <div className='mb-3'>
+                        <p className="font-semibold mb-2">Custom</p>
+                        <s-checkbox
+                          label="Custom CSS"
+                          checked={enableCustomCss}
+                          onChange={(e) => setEnableCustomCss(e.target.checked)}
+                        />
+                        {enableCustomCss && <s-text-area
+                          value={customCss}
+                          placeholder="Enter your custom css here"
+                          rows={4}
+                          onInput={(e) => setCustomCss(e.target.value)}
+                        />}
+                        {enableCustomCss && (
+                          <p className="text-[11px] text-gray-500 mt-1">
+                            Example: font-size:14px; text-transform:uppercase;
+                          </p>
+                        )}
+                      </div>
+                    </>
+                  }
+                  {type !== 'badgesGroup' &&
+                    <>
+                      <div className='mb-3'><s-divider /></div>
+                      <div className='mb-3'>
+                        <p className="font-semibold mb-2">Visibility date </p>
+                        <div className='flex gap-3 items-center mb-2'>
+                          <s-choice-list
+                          >
+                            <s-choice value="Always visible">Always visible</s-choice>
+                          </s-choice-list>
+                          <s-choice-list
+                          >
+                            <s-choice value="Specific dates">Specific dates</s-choice>
+                          </s-choice-list>
+                        </div>
+                        <div className='mb-3'>
+                          <p className='mb-1'>Start date</p>
+                          <s-date-field defaultView="2025-09" defaultValue="2025-09-01" />
+                        </div>
+                        <div className='mb-3'>
+                          <p className='mb-1'>End date</p>
+                          <s-date-field defaultView="2025-09" defaultValue="2025-09-01" />
+                        </div>
+                        <s-checkbox
+                          label="Daily recurring timer"
+                        />
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                          <div>
+                            <p className="mb-1 font-medium">Start time</p>
+                            <div className="flex">
+                              <div className="flex-1">
+                                <s-text-field value="09:00" />
+                              </div>
+                              <div className="w-[70px] flex items-center justify-between px-2 border border-[#B1B1B1] rounded-lg">
+                                <span className="font-medium">{startPeriod}</span>
+
+                                <div className="flex flex-col items-center justify-center ml-1">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
+                                    }
+                                    className="h-4 flex items-center justify-center opacity-70 hover:opacity-100"
+                                  >
+                                    <s-icon type="chevron-up" className="w-3 h-3" />
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
+                                    }
+                                    className="h-4 flex items-center justify-center opacity-70 hover:opacity-100"
+                                  >
+                                    <s-icon type="chevron-down" className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="mb-1 font-medium">End time</p>
+                            <div className="flex">
+                              <div className="flex-1">
+                                <s-text-field value="11:00" />
+                              </div>
+                              <div className="w-[70px] flex items-center justify-between px-2 border border-[#B1B1B1] rounded-lg">
+                                <span className="font-medium">{startPeriod}</span>
+
+                                <div className="flex flex-col items-center justify-center ml-1">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
+                                    }
+                                    className="h-4 flex items-center justify-center opacity-70 hover:opacity-100"
+                                  >
+                                    <s-icon type="chevron-up" className="w-3 h-3" />
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
+                                    }
+                                    className="h-4 flex items-center justify-center opacity-70 hover:opacity-100"
+                                  >
+                                    <s-icon type="chevron-down" className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              </div>
+
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div>
-                        <p className="mb-1 font-medium">End time</p>
-                        <div className="flex">
-                          <div className="flex-1">
-                            <s-text-field value="11:00" />
-                          </div>
-                          <div className="w-[70px] flex items-center justify-between px-2 border border-[#B1B1B1] rounded-lg">
-                            <span className="font-medium">{startPeriod}</span>
-
-                            <div className="flex flex-col items-center justify-center ml-1">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
-                                }
-                                className="h-4 flex items-center justify-center opacity-70 hover:opacity-100"
-                              >
-                                <s-icon type="chevron-up" className="w-3 h-3" />
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
-                                }
-                                className="h-4 flex items-center justify-center opacity-70 hover:opacity-100"
-                              >
-                                <s-icon type="chevron-down" className="w-3 h-3" />
-                              </button>
-                            </div>
-                          </div>
-
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    </>
+                  }
                 </div>
               </div>
             </div>
@@ -1049,7 +1228,15 @@ export default function LabelEditor() {
                   <div className='mb-3'><s-divider /></div>
 
                   <div>
-                    <p className="font-bold mb-2">Label display</p>
+                    <p className="font-bold mb-2">
+                      {type === 'labels'
+                        ? 'Label display'
+                        : type === 'badges'
+                          ? 'Badge display'
+                          : type === 'badgesGroup'
+                            ? 'Badge display'
+                            : ''}
+                    </p>
 
                     <p className="mb-1 font-semibold">Device</p>
                     <div className="flex gap-5 md:gap-16">
@@ -1145,14 +1332,14 @@ export default function LabelEditor() {
 
             </div>
           </div>
-          <div className={`transition-all duration-500 ease-in-out ${active === 'mobile' ? 'w-[375px] min-h-[667px] shadow-2xl border-[6px] border-gray-800 rounded-[3rem] mb-10 overflow-hidden bg-white mt-5' : 'w-full'}`}>
+          <div className={`transition-all duration-500 ease-in-out ${active === 'mobile' ? 'w-[320px] md:w-[375px] min-h-[667px] shadow-2xl border-[6px] border-gray-800 rounded-[3rem] mb-10 overflow-hidden bg-white mt-5' : 'w-full'}`}>
             <s-card>
               <div className={`space-y-4 bg-white rounded-2xl p-3 md:p-5 ${active === 'mobile' ? 'm-0' : 'm-2 md:m-5'}`}>
                 {previewPage === "collection" && (
                   <>
                     <p className="font-semibold text-xl">Your products</p>
 
-                    <div className={active === 'mobile' ? "grid grid-cols-2 gap-3" : "grid pb-4 grid-cols-1 md:grid-cols-4 gap-4"}>
+                    <div className={active === 'mobile' ? "grid grid-cols-2 gap-3" : "grid pb-4 grid-cols-2 md:grid-cols-4 gap-4"}>
                       {[1, 2, 3, 4].map((item) => (
                         <div key={item} className="flex-shrink-0">
                           <div className={`relative bg-[#E3EDFB] rounded-lg flex items-center justify-center overflow-hidden transition-all`}>
@@ -1190,17 +1377,25 @@ export default function LabelEditor() {
                               }}
                             >
                               {labelType === 'shape' ? (
-                                <div className="flex items-center justify-center w-full h-full" style={{ color: textColor }}>
+                                <div
+                                  className="w-full h-full flex items-center"
+                                  style={{ color: textColor, textAlign: alignment }}
+                                >
                                   <span
+                                    tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                    role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                    onClick={() => {
+                                      if (isActionLinkEnabled && actionLinkUrl) {
+                                        window.open(actionLinkUrl, "_blank");
+                                      }
+                                    }}
                                     className={`
-                                      ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
-                                      text-center
-                                      break-words
-                                      overflow-hidden
-                                    `}
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
                                     style={{
-                                      maxWidth: '100%',
-                                      maxHeight: '100%',
+                                      fontFamily: fontFamily,
                                       lineHeight: '1.2',
                                       display: '-webkit-box',
                                       WebkitLineClamp: 2,
@@ -1223,7 +1418,7 @@ export default function LabelEditor() {
                             <img
                               src={productFrame}
                               alt="Demo product"
-                              className={`w-full h-full object-contain transition-transform duration-300 hover:scale-105 ${active === 'mobile' ? 'p-6' : 'p-14'}`}
+                              className={`w-full h-full object-contain transition-transform duration-300 hover:scale-105 ${active === 'mobile' ? 'p-6' : 'p-5 md:p-14'}`}
                             />
                           </div>
 
@@ -1286,15 +1481,22 @@ export default function LabelEditor() {
                           }}
                         >
                           {labelType === 'shape' ? (
-                            <div style={{ color: textColor }}>
+                            <div className='w-full' style={{ color: textColor, textAlign: alignment }}>
                               <span
+                                tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                onClick={() => {
+                                  if (isActionLinkEnabled && actionLinkUrl) {
+                                    window.open(actionLinkUrl, "_blank");
+                                  }
+                                }}
                                 className={`
-                                      ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
-                                      text-center
-                                      break-words
-                                      overflow-hidden
-                                    `}
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
                                 style={{
+                                  fontFamily: fontFamily,
                                   maxWidth: '100%',
                                   maxHeight: '100%',
                                   lineHeight: '1.2',
@@ -1303,6 +1505,7 @@ export default function LabelEditor() {
                                   WebkitBoxOrient: 'vertical',
                                   wordBreak: 'break-word',
                                   ...parseCustomCss(customCss),
+                                  ...style
                                 }}
                               >
                                 {labelText}
