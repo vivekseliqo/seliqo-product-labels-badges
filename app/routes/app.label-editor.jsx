@@ -132,6 +132,11 @@ export default function LabelEditor() {
   const [isActionLinkEnabled, setIsActionLinkEnabled] = useState(false);
   const [actionLinkUrl, setActionLinkUrl] = useState("");
   const [labelTooltip, setLabelTooltip] = useState("");
+  const [visibilityType, setVisibilityType] = useState("");
+  const [dailyRecurringTime, setDailyRecurringTime] = useState(false);
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("11:00");
+  const [endPeriod, setEndPeriod] = useState("AM");
   const alignMenuRef = useRef(null);
   const fontMenuRef = useRef(null);
   const emojiMenuRef = useRef(null);
@@ -366,7 +371,8 @@ export default function LabelEditor() {
 
         {/* LEFT PANEL */}
         <div>
-          <div className="w-full md:w-[360px] overflow-y-auto border rounded-xl">
+          <div className="w-full 
+           overflow-y-auto border rounded-xl">
             <p className='p-3 font-bold'>
               {type === 'badgesGroup'
                 ? 'Badge group editor'
@@ -896,7 +902,7 @@ export default function LabelEditor() {
                             Display type
                           </p>
                           <s-select
-                            value={selectedDropdown}
+                            value={selectedDisplayType}
                             onChange={(val) => {
                               
                               setSelectedDisplayType(val);
@@ -1094,97 +1100,136 @@ export default function LabelEditor() {
                     <>
                       <div className='mb-3'><s-divider /></div>
                       <div className='mb-3'>
-                        <p className="font-semibold mb-2">Visibility date </p>
-                        <div className='flex gap-3 items-center mb-2'>
-                          <s-choice-list
-                          >
-                            <s-choice value="Always visible">Always visible</s-choice>
-                          </s-choice-list>
-                          <s-choice-list
-                          >
-                            <s-choice value="Specific dates">Specific dates</s-choice>
-                          </s-choice-list>
+                        <p className="font-semibold mb-2">Visibility date</p>
+                        <div className="flex gap-6 items-center mb-3">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="visibility"
+                              value="always"
+                              checked={visibilityType === "always"}
+                              onChange={(e) => setVisibilityType(e.target.value)}
+                              className="accent-blue-600"
+                            />
+                            <span className="text-sm">Always visible</span>
+                          </label>
+
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="visibility"
+                              value="specific"
+                              checked={visibilityType === "specific"}
+                              onChange={(e) => setVisibilityType(e.target.value)}
+                              className="accent-blue-600"
+                            />
+                            <span className="text-sm">Specific dates</span>
+                          </label>
                         </div>
-                        <div className='mb-3'>
-                          <p className='mb-1'>Start date</p>
-                          <s-date-field defaultView="2025-09" defaultValue="2025-09-01" />
-                        </div>
-                        <div className='mb-3'>
-                          <p className='mb-1'>End date</p>
-                          <s-date-field defaultView="2025-09" defaultValue="2025-09-01" />
-                        </div>
+                        {visibilityType === "specific" && (
+                          <>
+                            <div className="mb-3">
+                              <p className="mb-1">Start date</p>
+                              <s-date-field
+                                defaultView="2025-09"
+                                defaultValue="2025-09-01"
+                              />
+                            </div>
+
+                            <div className="mb-3">
+                              <p className="mb-1">End date</p>
+                              <s-date-field
+                                defaultView="2025-09"
+                                defaultValue="2025-09-01"
+                              />
+                            </div>
+                          </>
+                        )}
                         <s-checkbox
                           label="Daily recurring timer"
+                          checked={dailyRecurringTime}
+                          onChange={(e) => setDailyRecurringTime(e.target.checked)}
                         />
-                        <div className="grid grid-cols-2 gap-4 mt-2">
-                          <div>
-                            <p className="mb-1 font-medium">Start time</p>
-                            <div className="flex">
-                              <div className="flex-1">
-                                <s-text-field value="09:00" />
+                        {/* Time */}
+                        {dailyRecurringTime && (
+                          <div className="grid grid-cols-2 gap-4 mt-2">
+                            {/* Start */}
+                            <div>
+                              <p className="mb-1 font-medium">Start time</p>
+                              <div className="flex border border-[#B1B1B1] rounded-lg h-[38px] overflow-hidden">
+                                <input
+                                  value={startTime}
+                                  onChange={(e) => setStartTime(e.target.value)}
+                                  className="flex-1 px-3 outline-none text-sm"
+                                />
+
+                                <div className="w-px bg-[#B1B1B1]" />
+
+                                <div className="w-[70px] flex items-center justify-between px-2">
+                                  <span className="font-medium text-sm">{startPeriod}</span>
+                                  <div className="flex flex-col">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
+                                      }
+                                      className="h-4 opacity-70 hover:opacity-100"
+                                    >
+                                      <s-icon type="chevron-up" className="w-3 h-3" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
+                                      }
+                                      className="h-4 opacity-70 hover:opacity-100"
+                                    >
+                                      <s-icon type="chevron-down" className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="w-[70px] flex items-center justify-between px-2 border border-[#B1B1B1] rounded-lg">
-                                <span className="font-medium">{startPeriod}</span>
+                            </div>
 
-                                <div className="flex flex-col items-center justify-center ml-1">
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
-                                    }
-                                    className="h-4 flex items-center justify-center opacity-70 hover:opacity-100"
-                                  >
-                                    <s-icon type="chevron-up" className="w-3 h-3" />
-                                  </button>
+                            {/* End */}
+                            <div>
+                              <p className="mb-1 font-medium">End time</p>
+                              <div className="flex border border-[#B1B1B1] rounded-lg h-[38px] overflow-hidden">
+                                <input
+                                  value={endTime}
+                                  onChange={(e) => setEndTime(e.target.value)}
+                                  className="flex-1 px-3 outline-none text-sm"
+                                />
 
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
-                                    }
-                                    className="h-4 flex items-center justify-center opacity-70 hover:opacity-100"
-                                  >
-                                    <s-icon type="chevron-down" className="w-3 h-3" />
-                                  </button>
+                                <div className="w-px bg-[#B1B1B1]" />
+
+                                <div className="w-[70px] flex items-center justify-between px-2">
+                                  <span className="font-medium text-sm">{endPeriod}</span>
+                                  <div className="flex flex-col">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setEndPeriod(endPeriod === "AM" ? "PM" : "AM")
+                                      }
+                                      className="h-4 opacity-70 hover:opacity-100"
+                                    >
+                                      <s-icon type="chevron-up" className="w-3 h-3" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setEndPeriod(endPeriod === "AM" ? "PM" : "AM")
+                                      }
+                                      className="h-4 opacity-70 hover:opacity-100"
+                                    >
+                                      <s-icon type="chevron-down" className="w-3 h-3" />
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <div>
-                            <p className="mb-1 font-medium">End time</p>
-                            <div className="flex">
-                              <div className="flex-1">
-                                <s-text-field value="11:00" />
-                              </div>
-                              <div className="w-[70px] flex items-center justify-between px-2 border border-[#B1B1B1] rounded-lg">
-                                <span className="font-medium">{startPeriod}</span>
-
-                                <div className="flex flex-col items-center justify-center ml-1">
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
-                                    }
-                                    className="h-4 flex items-center justify-center opacity-70 hover:opacity-100"
-                                  >
-                                    <s-icon type="chevron-up" className="w-3 h-3" />
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
-                                    }
-                                    className="h-4 flex items-center justify-center opacity-70 hover:opacity-100"
-                                  >
-                                    <s-icon type="chevron-down" className="w-3 h-3" />
-                                  </button>
-                                </div>
-                              </div>
-
-                            </div>
-                          </div>
-                        </div>
+                        )}
                       </div>
                     </>
                   }
