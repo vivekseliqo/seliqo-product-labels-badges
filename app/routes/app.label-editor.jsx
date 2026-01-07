@@ -354,9 +354,11 @@ export default function LabelEditor() {
                 ? 'Offer label'
                 : type === 'badges'
                   ? 'Offer badge'
-                  : type === 'badgesGroup'
-                    ? 'Badge group'
-                    : ''
+                  : type === 'labelGroup'
+                    ? 'Label group'
+                    : type === 'badgeGroup'
+                      ? 'Badge group'
+                      : ''
             }
           />
         </div>
@@ -371,16 +373,18 @@ export default function LabelEditor() {
 
         {/* LEFT PANEL */}
         <div>
-          <div className="w-full 
+          <div className="w-full md:w-[370px] 
            overflow-y-auto border rounded-xl">
             <p className='p-3 font-bold'>
-              {type === 'badgesGroup'
+              {type === 'badgeGroup'
                 ? 'Badge group editor'
-                : type === 'badges'
-                  ? 'Badge editor'
-                  : type === 'labels'
-                    ? 'Label editor'
-                    : null}
+                : type === 'labelGroup'
+                  ? 'Label group editor'
+                  : type === 'badges'
+                    ? 'Badge editor'
+                    : type === 'labels'
+                      ? 'Label editor'
+                      : null}
             </p>
             <div className="overflow-hidden border-b">
               <div
@@ -394,9 +398,11 @@ export default function LabelEditor() {
                       ? 'Label design setting'
                       : type === 'badges'
                         ? 'Badge design setting'
-                        : type === 'badgesGroup'
-                          ? 'Badge group design setting'
-                          : ''}
+                        : type === 'labelGroup'
+                          ? 'Label group design setting'
+                          : type === 'badgeGroup'
+                            ? 'Badge group design setting'
+                            : ''}
                   </b>
                 </div>
                 <div className={`transition-transform duration-300 ${designOpen ? "rotate-180" : ""}`}>
@@ -408,8 +414,15 @@ export default function LabelEditor() {
                   }`}
               >
                 <div className='p-3'>
-                  <p className='mb-3 font-bold'>{type === 'badgesGroup' ? 'Add created badge' : 'Shapes Design'}</p>
-                  {type === 'badgesGroup' ?
+                  <p className='mb-3 font-bold'>{
+                    type === 'labelGroup'
+                      ? 'Add created label'
+                      : type === 'badgeGroup'
+                        ? 'Add created badge'
+                        : 'Shapes Design'
+                  }
+                  </p>
+                  {(type === 'badgeGroup' && type === 'labelGroup') ?
                     <div className="grid grid-cols-5 gap-3 p-2 max-h-[150px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                       <div className='min-w-[56px] h-[56px]'>
                         <s-drop-zone
@@ -443,14 +456,16 @@ export default function LabelEditor() {
                           onClick={() => setLabelType('image')}
                           className={`${labelType === 'image' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
                         >
-                          
+
                           {type === 'labels'
                             ? 'Readymade image label'
                             : type === 'badges'
                               ? 'Readymade image label'
-                              : type === 'badgesGroup'
-                                ? 'Readymade image badge'
-                                : ''}
+                              : type === 'labelGroup'
+                                ? 'Readymade image label'
+                                : type === 'badgeGroup'
+                                  ? 'Readymade image badge'
+                                  : ''}
                         </button>
                       </div>
 
@@ -524,9 +539,11 @@ export default function LabelEditor() {
                             ? 'Label text'
                             : type === 'badges'
                               ? 'Badge text'
-                              : type === 'badgesGroup'
+                              : type === 'badgeGroup'
                                 ? 'Badge text'
-                                : ''}
+                                : type === 'labelGroup'
+                                  ? 'Label text'
+                                  : ''}
                         </p>
                         <div className='border rounded-lg'>
                           <div className='flex gap-[6px] border-b p-2 bg-[#FAFAFA] items-center'>
@@ -806,7 +823,7 @@ export default function LabelEditor() {
                     </div>
                   }
 
-                  {type !== 'badgesGroup' &&
+                  {(type !== 'badgeGroup' && type !== 'labelGroup') &&
                     <>
                       <div className='mb-3'><s-divider /></div>
                       <p className='font-bold mb-2'>Interaction setting</p>
@@ -843,9 +860,9 @@ export default function LabelEditor() {
                   <div className='my-3'><s-divider /></div>
                   <div className='mb-3'>
                     <p className="font-semibold mb-2">
-                      {type === 'labels' ? 'Label position' : type === 'badges' ? 'Badge position' : type === 'badgesGroup' ? 'Badge position' : ''}
+                      {type === 'labels' ? 'Label position' : type === 'badges' ? 'Badge position' : type === 'badgeGroup' ? 'Badge position' : type === 'labelGroup' ? 'Label position' : ''}
                     </p>
-                    {previewPage === "collection" ? (
+                    {(previewPage === "collection" || previewPage === 'product') ? (
                       <div className="relative bg-[#F0ECE8] p-4 rounded-xl w-[260px]">
                         <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
                           <img
@@ -880,7 +897,7 @@ export default function LabelEditor() {
                       <div>
                         <div className='mb-3'>
                           <p className='mb-1'>
-                            {type === 'labels' ? 'Label to display' : type === 'badges' ? 'Badge to display' : type === 'badgesGroup' ? 'Badge to display' : ''}
+                            {type === 'labels' ? 'Label to display' : type === 'badges' ? 'Badge to display' : type === 'badgeGroup' ? 'Badge to display' : type === 'labelGroup' ? 'Label to display' : ''}
                           </p>
                           <s-select
                             value={selectedDropdown}
@@ -904,7 +921,7 @@ export default function LabelEditor() {
                           <s-select
                             value={selectedDisplayType}
                             onChange={(val) => {
-                              
+
                               setSelectedDisplayType(val);
                               const pos = displayTypeOptions.find(p => p.id === val);
                               if (pos) setSelected(pos.className);
@@ -1036,7 +1053,7 @@ export default function LabelEditor() {
                       </div>
                     </>
                   }
-                  {type === 'badgesGroup' &&
+                  {(type === 'badgeGroup' && type === 'labelGroup') &&
                     <>
                       <div className='mb-3'><s-divider /></div>
                       <div className='mb-3'>
@@ -1096,7 +1113,7 @@ export default function LabelEditor() {
                       </div>
                     </>
                   }
-                  {type !== 'badgesGroup' &&
+                  {(type !== 'badgeGroup' && type !== 'labelGroup') &&
                     <>
                       <div className='mb-3'><s-divider /></div>
                       <div className='mb-3'>
@@ -1278,9 +1295,11 @@ export default function LabelEditor() {
                         ? 'Label display'
                         : type === 'badges'
                           ? 'Badge display'
-                          : type === 'badgesGroup'
+                          : type === 'badgeGroup'
                             ? 'Badge display'
-                            : ''}
+                            : type === 'labelGroup'
+                              ? 'Label display'
+                              : ''}
                     </p>
 
                     <p className="mb-1 font-semibold">Device</p>
@@ -1388,7 +1407,7 @@ export default function LabelEditor() {
                       {[1, 2, 3, 4].map((item) => (
                         <div key={item} className="flex-shrink-0">
                           <div className={`relative bg-[#E3EDFB] rounded-lg flex items-center justify-center overflow-hidden transition-all`}>
-                            <div
+                            {type === 'labels' && <div
                               className={`absolute z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
                               style={{
                                 width: `${badgeWidth}px`,
@@ -1458,7 +1477,7 @@ export default function LabelEditor() {
                                   <img src={selectedImageUrl} alt="label" className="max-w-full max-h-full object-contain" />
                                 )
                               )}
-                            </div>
+                            </div>}
 
                             <img
                               src={productFrame}
@@ -1468,9 +1487,12 @@ export default function LabelEditor() {
                           </div>
 
                           <div className="mt-3 space-y-1">
-                            <p className={`${active === 'mobile' ? 'text-[13px]' : 'text-[16px]'} font-semibold text-gray-900`}>
-                              Demo product
-                            </p>
+                            <div className='flex gap-5 items-center'>
+                              {type === 'badges' && selectedImageUrl && <img src={selectedImageUrl} alt="label" className="w-12 h-12 object-contain" />}
+                              <p className={`${active === 'mobile' ? 'text-[13px]' : 'text-[16px]'} font-semibold text-gray-900`}>
+                                Demo product
+                              </p>
+                            </div>
                             <p className={`${active === 'mobile' ? 'text-[12px]' : 'text-gray-600'} font-medium`}>$16.00</p>
                           </div>
                         </div>
@@ -1487,13 +1509,81 @@ export default function LabelEditor() {
                     className={`grid ${active === "mobile" ? "grid-cols-1" : "grid-cols-2"} gap-6`}
                   >
                     <div className="relative bg-[#E3EDFB] rounded-xl flex items-center justify-center p-10">
+                      <div
+                        className={`absolute z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
+                        style={{
+                          width: `${badgeWidth}px`,
+                          height: `${badgeHeight}px`,
+                          opacity: badgeOpacity / 100,
+                          margin: `${badgeMargin}px`,
+                          padding: `${badgePadding}px`,
+                          borderRadius: `${badgeRadius}px`,
+                          ...(labelType === 'shape'
+                            ? {
+                              background:
+                                fillType === "solid"
+                                  ? color1
+                                  : fillType === "gradient"
+                                    ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                    : "transparent",
+
+                              WebkitMaskImage: `url(${shapeImages[shape]})`,
+                              WebkitMaskSize: 'contain',
+                              WebkitMaskRepeat: 'no-repeat',
+                              WebkitMaskPosition: 'center',
+                              maskImage: `url(${shapeImages[shape]})`,
+                              maskSize: 'contain',
+                              maskRepeat: 'no-repeat',
+                              maskPosition: 'center',
+                            }
+                            : {
+                              background: 'transparent',
+                            }),
+                        }}
+                      >
+                        {labelType === 'shape' ? (
+                          <div
+                            className="w-full h-full flex items-center"
+                            style={{ color: textColor, textAlign: alignment }}
+                          >
+                            <span
+                              tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                              role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                              onClick={() => {
+                                if (isActionLinkEnabled && actionLinkUrl) {
+                                  window.open(actionLinkUrl, "_blank");
+                                }
+                              }}
+                              className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                              style={{
+                                fontFamily: fontFamily,
+                                lineHeight: '1.2',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                wordBreak: 'break-word',
+                                ...parseCustomCss(customCss),
+                                ...style
+                              }}
+                            >
+                              {labelText}
+                            </span>
+                          </div>
+                        ) : (
+                          ''
+                        )}
+                      </div>
                       <img src={productFrame} className="max-w-full" />
                     </div>
 
                     <div className="space-y-3">
                       <p className="text-2xl font-bold">Demo product</p>
                       <p className="text-lg font-semibold">$16.00</p>
-                      <div className={`flex ${getProductLabelAlign()} mb-1`}>
+                      {(type === 'badges' || labelType === 'image') && <div className={`flex ${getProductLabelAlign()} mb-1`}>
                         <div
                           className="flex items-center"
                           style={{
@@ -1562,7 +1652,7 @@ export default function LabelEditor() {
                             )
                           )}
                         </div>
-                      </div>
+                      </div>}
 
                       <div className="space-y-4 max-w-[420px] pt-2">
                         <div>

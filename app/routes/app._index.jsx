@@ -1,7 +1,10 @@
 import { useState } from "react";
 import enableAppImage from "../images/enable_app.png";
+import createLabel from "../images/create_label.png";
+import { useNavigate } from 'react-router-dom';
 
 export default function Index() {
+  const navigate = useNavigate();
   // const [openDatePicker, setOpenDatePicker] = useState(false);
   const [isAppEnabled, setIsAppEnabled] = useState(false);
 
@@ -147,6 +150,77 @@ export default function Index() {
                 <p className="text-[17px] font-bold">10</p>
               </div>
             </s-box>
+          </div>
+        </s-card>
+      </div>
+
+      <div className="m-4 md:m-0 border rounded-xl bg-white p-4 !mb-4">
+        <s-card>
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex gap-2 items-center">
+              <s-text type="strong">Main features</s-text>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <s-box padding="base" border="base" borderRadius="base" className="w-full">
+                <div className="flex justify-between items-stretch">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-2">
+                      <p className="font-bold">Label</p>
+                      <p className="text-[13px]">Create and manage product labels for your Shopify store</p>
+                    </div>
+                    <s-button
+                      variant="auto"
+                      commandFor="create-label-modal"
+                      command="--show"
+                      onClick={() =>
+                        navigate('/app/label-editor', { state: { type: 'labels' } })
+                      }
+                    >
+                      Create label
+                    </s-button>
+                  </div>
+                  <div className="flex items-center">
+                    <img
+                      className="w-20 h-20 object-contain"
+                      src={createLabel}
+                      alt="create badge"
+                    />
+                  </div>
+                </div>
+              </s-box>
+            </div>
+            <div>
+              <s-box padding="base" border="base" borderRadius="base" className="w-full">
+                <div className="flex justify-between items-stretch">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-2">
+                      <p className="font-bold">Badge</p>
+                      <p className="text-[13px]">Design eye-catching badges to highlight your Shopify products</p>
+                    </div>
+                    <s-button
+                      variant="auto"
+                      commandFor="create-label-modal"
+                      command="--show"
+                      onClick={() =>
+                        navigate('/app/label-editor', { state: { type: 'badges' } })
+                      }
+                    >
+                      Create badge
+                    </s-button>
+                  </div>
+                  <div className="flex items-center">
+                    <img
+                      className="w-20 h-20 object-contain"
+                      src={createLabel}
+                      alt="create badge"
+                    />
+                  </div>
+                </div>
+              </s-box>
+            </div>
           </div>
         </s-card>
       </div>
