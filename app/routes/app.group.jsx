@@ -248,11 +248,12 @@ export default function Group() {
                           id="customer-menu"
                           accessibilityLabel="Customer actions"
                         >
-                          <s-button icon="toggle-off">Deactivate</s-button>
-                          <s-button icon="duplicate">Duplicate</s-button>
-                          <s-button icon="delete" tone="critical">
-                            Delete
-                          </s-button>
+                          <s-button icon="edit">Rename</s-button>
+                            <s-button icon="toggle-off">Deactivate</s-button>
+                            <s-button icon="duplicate">Duplicate</s-button>
+                            <s-button icon="delete" tone="critical">
+                              Remove
+                            </s-button>
                         </s-menu>
                         <button
                           className="p-1 hover:bg-gray-100"

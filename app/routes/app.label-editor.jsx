@@ -293,7 +293,7 @@ export default function LabelEditor() {
       "top-right": "top-0 right-0",
       "middle-left": "top-1/2 left-0 -translate-y-1/2",
       "center": "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
-      "middle-right": "top-1/2 right-3 -translate-y-1/2",
+      "middle-right": "top-1/2 right-0 -translate-y-1/2",
       "bottom-left": "bottom-0 left-0",
       "bottom-center": "bottom-0 left-1/2 -translate-x-1/2",
       "bottom-right": "bottom-0 right-0",
@@ -422,36 +422,44 @@ export default function LabelEditor() {
                         : 'Shapes Design'
                   }
                   </p>
-                  {(type === 'badgeGroup' && type === 'labelGroup') ?
-                    <div className="grid grid-cols-5 gap-3 p-2 max-h-[150px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                      <div className='min-w-[56px] h-[56px]'>
-                        <s-drop-zone
-                          accessibilityLabel="Upload image"
-                          accept=".jpg,.png,.gif"
-                          onChange={handleDrop}
-                          onDrop={handleDrop}
-                        />
-                      </div>
-
-                      {findTrustImage.map((img) => (
+                  {(type === 'badgeGroup' || type === 'labelGroup') ?
+                    <div className="grid grid-cols-5 gap-3 p-2 max-h-[150px] overflow-y-auto border rounded-lg p-4" style={{ scrollbarWidth: 'thin' }}>
+                      {findTrustImage?.slice(0, 4).map((img) => (
                         <div
                           key={img.id}
                           onClick={() => setSelectedImageUrl(img.url)}
-                          className={`min-w-[56px] h-[56px] border-2 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden ${selectedImageUrl === img.url ? 'border-blue-600 bg-blue-50' : 'border-gray-100'
+                          className={`min-w-[56px] h-[56px] border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden ${selectedImageUrl === img.url ? 'border-blue-600 bg-blue-50' : 'border-gray-100'
                             }`}
                         >
                           <img src={img.url} alt={img.id} className="w-10 h-10 object-contain" />
                         </div>
                       ))}
+                      <div className="min-w-[56px] h-[56px]">
+                        <button
+                          commandFor="modal"
+                          command="--show"
+                          class="w-[56px] h-[56px] flex items-center justify-center border border-dashed rounded-lg"
+                        >
+                          <s-icon type="plus" size="large" />
+                        </button>
+                      </div>
                     </div>
                     : <div className='border rounded-lg mb-3'>
                       <div className="flex gap-1 mb-4 border-b p-2">
-                        {type === 'labels' && <button
+                        <button
                           onClick={() => setLabelType('shape')}
                           className={`${labelType === 'shape' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
                         >
-                          Shape label
-                        </button>}
+                          {type === 'labels'
+                            ? 'Shape label'
+                            : type === 'badges'
+                              ? 'Shape badge'
+                              : type === 'labelGroup'
+                                ? 'Shape label'
+                                : type === 'badgeGroup'
+                                  ? 'Shape badge'
+                                  : ''}
+                        </button>
                         <button
                           onClick={() => setLabelType('image')}
                           className={`${labelType === 'image' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
@@ -471,12 +479,12 @@ export default function LabelEditor() {
 
                       {labelType === 'shape' ? (
                         <>
-                          {type === 'labels' && <div className="grid grid-cols-5 gap-3 p-2 max-h-[150px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                          <div className="grid grid-cols-5 gap-3 p-2 max-h-[150px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                             {Object.keys(shapeImages).map((s) => (
                               <div
                                 key={s}
                                 onClick={() => setShape(s)}
-                                className={`min-w-[56px] h-[56px] border-2 rounded-lg flex items-center justify-center cursor-pointer transition-all ${shape === s ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-300'
+                                className={`min-w-[56px] h-[56px] border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer transition-all ${shape === s ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-300'
                                   }`}
                               >
                                 <div
@@ -503,7 +511,7 @@ export default function LabelEditor() {
                                 />
                               </div>
                             ))}
-                          </div>}
+                          </div>
                         </>
                       ) : (
                         <div className="grid grid-cols-5 gap-3 p-2 max-h-[150px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
@@ -520,7 +528,7 @@ export default function LabelEditor() {
                             <div
                               key={img.id}
                               onClick={() => setSelectedImageUrl(img.url)}
-                              className={`min-w-[56px] h-[56px] border-2 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden ${selectedImageUrl === img.url ? 'border-blue-600 bg-blue-50' : 'border-gray-100'
+                              className={`min-w-[56px] h-[56px] border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden ${selectedImageUrl === img.url ? 'border-blue-600 bg-blue-50' : 'border-gray-100'
                                 }`}
                             >
                               <img src={img.url} alt={img.id} className="w-10 h-10 object-contain" />
@@ -862,106 +870,103 @@ export default function LabelEditor() {
                     <p className="font-semibold mb-2">
                       {type === 'labels' ? 'Label position' : type === 'badges' ? 'Badge position' : type === 'badgeGroup' ? 'Badge position' : type === 'labelGroup' ? 'Label position' : ''}
                     </p>
-                    {(previewPage === "collection" || previewPage === 'product') ? (
-                      <div className="relative bg-[#F0ECE8] p-4 rounded-xl w-[260px]">
-                        <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
-                          <img
-                            src={productFrame}
-                            alt="product"
-                            className="h-32 opacity-80"
-                          />
-                        </div>
+                    {(type === "labels" || type === "badges") && <div className="relative bg-[#F0ECE8] p-4 rounded-xl w-[260px]">
+                      <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
+                        <img
+                          src={productFrame}
+                          alt="product"
+                          className="h-32 opacity-80"
+                        />
+                      </div>
 
-                        <div className="relative z-10 grid grid-cols-3 gap-3">
-                          {positions.map((pos) => (
-                            <button
-                              key={pos}
-                              onClick={() => setSelected(pos)}
-                              className={`relative h-16 rounded-lg border transition-all
+                      <div className="relative z-10 grid grid-cols-3 gap-3">
+                        {positions.map((pos) => (
+                          <button
+                            key={pos}
+                            onClick={() => setSelected(pos)}
+                            className={`relative h-16 rounded-lg border transition-all
                           ${selected === pos
-                                  ? "bg-white"
-                                  : "border-transparent bg-white/70 hover:border-gray-300"
-                                }
+                                ? "bg-white"
+                                : "border-transparent bg-white/70 hover:border-gray-300"
+                              }
                          `}
-                            >
-                              {selected === pos && (
-                                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center">
-                                  <img src={statusActivation} alt="status" />
-                                </div>
-                              )}
-                            </button>
+                          >
+                            {selected === pos && (
+                              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center">
+                                <img src={statusActivation} alt="status" />
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>}
+                    {(type === "labelGroup" || type === "badgeGroup") && <div>
+                      <div className='mb-3'>
+                        <p className='mb-1'>
+                          {type === 'labels' ? 'Label to display' : type === 'badges' ? 'Badge to display' : type === 'badgeGroup' ? 'Badge to display' : type === 'labelGroup' ? 'Label to display' : ''}
+                        </p>
+                        <s-select
+                          value={selectedDropdown}
+                          onChange={(val) => {
+                            setSelectedDropdown(val);
+                            const pos = labelPositionsDropdown.find(p => p.id === val);
+                            if (pos) setSelected(pos.className);
+                          }}
+                        >
+                          {labelPositionsDropdown.map((pos) => (
+                            <s-option key={pos.id} value={pos.id}>
+                              {pos.label}
+                            </s-option>
                           ))}
-                        </div>
+                        </s-select>
                       </div>
-                    ) : (
-                      <div>
-                        <div className='mb-3'>
-                          <p className='mb-1'>
-                            {type === 'labels' ? 'Label to display' : type === 'badges' ? 'Badge to display' : type === 'badgeGroup' ? 'Badge to display' : type === 'labelGroup' ? 'Label to display' : ''}
-                          </p>
-                          <s-select
-                            value={selectedDropdown}
-                            onChange={(val) => {
-                              setSelectedDropdown(val);
-                              const pos = labelPositionsDropdown.find(p => p.id === val);
-                              if (pos) setSelected(pos.className);
-                            }}
-                          >
-                            {labelPositionsDropdown.map((pos) => (
-                              <s-option key={pos.id} value={pos.id}>
-                                {pos.label}
-                              </s-option>
-                            ))}
-                          </s-select>
-                        </div>
-                        <div className='mb-3'>
-                          <p className='mb-1'>
-                            Display type
-                          </p>
-                          <s-select
-                            value={selectedDisplayType}
-                            onChange={(val) => {
+                      <div className='mb-3'>
+                        <p className='mb-1'>
+                          Display type
+                        </p>
+                        <s-select
+                          value={selectedDisplayType}
+                          onChange={(val) => {
 
-                              setSelectedDisplayType(val);
-                              const pos = displayTypeOptions.find(p => p.id === val);
-                              if (pos) setSelected(pos.className);
-                            }}
-                          >
-                            {displayTypeOptions.map((pos) => (
-                              <s-option key={pos.id} value={pos.id}>
-                                {pos.label}
-                              </s-option>
-                            ))}
-                          </s-select>
-                        </div>
-                        <div className="bg-gray-100 rounded-xl p-1 flex">
-                          <button
-                            onClick={() => setProductAlign("left")}
-                            className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "left" ? "bg-white shadow-sm" : ""
-                              }`}
-                          >
-                            <s-icon type="arrow-left" />
-                          </button>
-
-                          <button
-                            onClick={() => setProductAlign("center")}
-                            className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "center" ? "bg-white shadow-sm" : ""
-                              }`}
-                          >
-                            <img src={Blank} className="w-5 h-5" />
-                          </button>
-
-                          <button
-                            onClick={() => setProductAlign("right")}
-                            className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "right" ? "bg-white shadow-sm" : ""
-                              }`}
-                          >
-                            <s-icon type="arrow-right" />
-                          </button>
-                        </div>
-
+                            setSelectedDisplayType(val);
+                            const pos = displayTypeOptions.find(p => p.id === val);
+                            if (pos) setSelected(pos.className);
+                          }}
+                        >
+                          {displayTypeOptions.map((pos) => (
+                            <s-option key={pos.id} value={pos.id}>
+                              {pos.label}
+                            </s-option>
+                          ))}
+                        </s-select>
                       </div>
-                    )}
+                      <div className="bg-gray-100 rounded-xl p-1 flex">
+                        <button
+                          onClick={() => setProductAlign("left")}
+                          className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "left" ? "bg-white shadow-sm" : ""
+                            }`}
+                        >
+                          <s-icon type="arrow-left" />
+                        </button>
+
+                        <button
+                          onClick={() => setProductAlign("center")}
+                          className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "center" ? "bg-white shadow-sm" : ""
+                            }`}
+                        >
+                          <img src={Blank} className="w-5 h-5" />
+                        </button>
+
+                        <button
+                          onClick={() => setProductAlign("right")}
+                          className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "right" ? "bg-white shadow-sm" : ""
+                            }`}
+                        >
+                          <s-icon type="arrow-right" />
+                        </button>
+                      </div>
+
+                    </div>}
                   </div>
                   {labelType === 'shape' &&
                     <>
@@ -1053,7 +1058,7 @@ export default function LabelEditor() {
                       </div>
                     </>
                   }
-                  {(type === 'badgeGroup' && type === 'labelGroup') &&
+                  {(type === 'badgeGroup' || type === 'labelGroup') &&
                     <>
                       <div className='mb-3'><s-divider /></div>
                       <div className='mb-3'>
@@ -1281,11 +1286,81 @@ export default function LabelEditor() {
                     <s-select>
                       <s-option value="1">All product</s-option>
                       <s-option value="2">Specific collection</s-option>
-                      <s-option value="3">Specific product</s-option>
+                      <s-option commandFor="modal" command="--show" value="3">Specific product</s-option>
                       <s-option value="4">Product tag</s-option>
                       <s-option value="5">Condition</s-option>
                     </s-select>
                   </div>
+
+                  <s-modal id="modal" heading="Add product" padding='none'>
+                    <div className='p-3 border-b'>
+                      <s-search-field
+                        label="Search"
+                        labelAccessibilityVisibility="exclusive"
+                        placeholder="Search product"
+                      />
+                    </div>
+
+                    <div className='mt-3 space-y-3'>
+                      <div className="flex items-center gap-3 border-b pb-3 px-4">
+                        <s-checkbox />
+                        <s-thumbnail
+                          alt="White sneakers"
+                          src="https://cdn.shopify.com/static/images/polaris/thumbnail-wc_src.jpg"
+                          size='small'
+                        />
+                        <span className="text-sm font-medium">Product 1</span>
+                      </div>
+                      <div className="flex items-center gap-3 border-b pb-3 px-4">
+                        <s-checkbox />
+                        <s-thumbnail
+                          alt="White sneakers"
+                          src="https://cdn.shopify.com/static/images/polaris/thumbnail-wc_src.jpg"
+                          size='small'
+                        />
+                        <span className="text-sm font-medium">Product 1</span>
+                      </div>
+                      <div className="flex items-center gap-3 border-b pb-3 px-4">
+                        <s-checkbox />
+                        <s-thumbnail
+                          alt="White sneakers"
+                          src="https://cdn.shopify.com/static/images/polaris/thumbnail-wc_src.jpg"
+                          size='small'
+                        />
+                        <span className="text-sm font-medium">Product 1</span>
+                      </div>
+                      <div className="flex items-center gap-3 border-b pb-3 px-4">
+                        <s-checkbox />
+                        <s-thumbnail
+                          alt="White sneakers"
+                          src="https://cdn.shopify.com/static/images/polaris/thumbnail-wc_src.jpg"
+                          size='small'
+                        />
+                        <span className="text-sm font-medium">Product 1</span>
+                      </div>
+                      <div className="flex items-center gap-3 pb-3 px-4">
+                        <s-checkbox />
+                        <s-thumbnail
+                          alt="White sneakers"
+                          src="https://cdn.shopify.com/static/images/polaris/thumbnail-wc_src.jpg"
+                          size='small'
+                        />
+                        <span className="text-sm font-medium">Product 1</span>
+                      </div>
+                    </div>
+
+                    <s-button slot="secondary-actions" commandFor="modal" command="--hide">
+                      Close
+                    </s-button>
+                    <s-button
+                      slot="primary-action"
+                      variant="primary"
+                      commandFor="modal"
+                      command="--hide"
+                    >
+                      Add
+                    </s-button>
+                  </s-modal>
 
                   <div className='mb-3'><s-divider /></div>
 
@@ -1363,7 +1438,6 @@ export default function LabelEditor() {
                         ? "Collection page"
                         : "Product page"}
                     </span>
-                    <s-icon type="chevron-down" />
                   </div>
                 </s-button>
 
@@ -1487,11 +1561,90 @@ export default function LabelEditor() {
                           </div>
 
                           <div className="mt-3 space-y-1">
-                            <div className='flex gap-5 items-center'>
-                              {type === 'badges' && selectedImageUrl && <img src={selectedImageUrl} alt="label" className="w-12 h-12 object-contain" />}
-                              <p className={`${active === 'mobile' ? 'text-[13px]' : 'text-[16px]'} font-semibold text-gray-900`}>
-                                Demo product
-                              </p>
+                            <div className='flex flex-col gap-2'>
+                              <div className='flex gap-3 items-center'>
+                                {type === 'badges' && <div
+                                  className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
+                                  style={{
+                                    width: `${badgeWidth}px`,
+                                    height: `${badgeHeight}px`,
+                                    opacity: badgeOpacity / 100,
+                                    margin: `${badgeMargin}px`,
+                                    padding: `${badgePadding}px`,
+                                    borderRadius: `${badgeRadius}px`,
+                                    ...(labelType === 'shape'
+                                      ? {
+                                        background:
+                                          fillType === "solid"
+                                            ? color1
+                                            : fillType === "gradient"
+                                              ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                              : "transparent",
+
+                                        WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                        WebkitMaskSize: 'contain',
+                                        WebkitMaskRepeat: 'no-repeat',
+                                        WebkitMaskPosition: 'center',
+                                        maskImage: `url(${shapeImages[shape]})`,
+                                        maskSize: 'contain',
+                                        maskRepeat: 'no-repeat',
+                                        maskPosition: 'center',
+                                      }
+                                      : {
+                                        background: 'transparent',
+                                      }),
+                                  }}
+                                >
+                                  {labelType === 'shape' ? (
+                                    <div
+                                      className="w-full h-full flex items-center"
+                                      style={{ color: textColor, textAlign: alignment }}
+                                    >
+                                      <span
+                                        tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                        role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                        onClick={() => {
+                                          if (isActionLinkEnabled && actionLinkUrl) {
+                                            window.open(actionLinkUrl, "_blank");
+                                          }
+                                        }}
+                                        className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                        style={{
+                                          fontFamily: fontFamily,
+                                          lineHeight: '1.2',
+                                          display: '-webkit-box',
+                                          WebkitLineClamp: 2,
+                                          WebkitBoxOrient: 'vertical',
+                                          wordBreak: 'break-word',
+                                          ...parseCustomCss(customCss),
+                                          ...style
+                                        }}
+                                      >
+                                        {labelText}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    selectedImageUrl && (
+                                      <img src={selectedImageUrl} alt="label" className="max-w-full max-h-full object-contain" />
+                                    )
+                                  )}
+                                </div>}
+                                <p className={`${active === 'mobile' ? 'text-[13px]' : 'text-[16px]'} font-semibold text-gray-900`}>
+                                  Demo product
+                                </p>
+                              </div>
+                              {type === 'badgeGroup' && selectedImageUrl &&
+                                <div className='flex gap-2'>
+                                  <img src={selectedImageUrl} alt="label" className="w-10 h-10 object-contain" />
+                                  <img src={selectedImageUrl} alt="label" className="w-10 h-10 object-contain" />
+                                  <img src={selectedImageUrl} alt="label" className="w-10 h-10 object-contain" />
+                                  <img src={selectedImageUrl} alt="label" className="w-10 h-10 object-contain" />
+                                </div>
+                              }
                             </div>
                             <p className={`${active === 'mobile' ? 'text-[12px]' : 'text-gray-600'} font-medium`}>$16.00</p>
                           </div>
@@ -1509,7 +1662,7 @@ export default function LabelEditor() {
                     className={`grid ${active === "mobile" ? "grid-cols-1" : "grid-cols-2"} gap-6`}
                   >
                     <div className="relative bg-[#E3EDFB] rounded-xl flex items-center justify-center p-10">
-                      <div
+                      {(type === 'labels') && <div
                         className={`absolute z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
                         style={{
                           width: `${badgeWidth}px`,
@@ -1574,16 +1727,18 @@ export default function LabelEditor() {
                             </span>
                           </div>
                         ) : (
-                          ''
+                          selectedImageUrl && (
+                            <img src={selectedImageUrl} alt="label" className="max-w-full max-h-full object-contain" />
+                          )
                         )}
-                      </div>
+                      </div>}
                       <img src={productFrame} className="max-w-full" />
                     </div>
 
                     <div className="space-y-3">
                       <p className="text-2xl font-bold">Demo product</p>
                       <p className="text-lg font-semibold">$16.00</p>
-                      {(type === 'badges' || labelType === 'image') && <div className={`flex ${getProductLabelAlign()} mb-1`}>
+                      {type === 'badges' && <div className={`flex ${getProductLabelAlign()} mb-1`}>
                         <div
                           className="flex items-center"
                           style={{
@@ -1653,7 +1808,18 @@ export default function LabelEditor() {
                           )}
                         </div>
                       </div>}
-
+                      {type === 'badgeGroup' && (
+                        <div>
+                          {selectedImageUrl && (
+                            <div className='flex gap-3'>
+                              <img src={selectedImageUrl} alt="label" className="w-14 h-14 object-contain" />
+                              <img src={selectedImageUrl} alt="label" className="w-14 h-14 object-contain" />
+                              <img src={selectedImageUrl} alt="label" className="w-14 h-14 object-contain" />
+                              <img src={selectedImageUrl} alt="label" className="w-14 h-14 object-contain" />
+                            </div>
+                          )}
+                        </div>
+                      )}
                       <div className="space-y-4 max-w-[420px] pt-2">
                         <div>
                           <p className="mb-2 text-sm font-medium">Quantity</p>

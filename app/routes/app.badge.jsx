@@ -287,10 +287,11 @@ export default function Badge() {
                             id="customer-menu"
                             accessibilityLabel="Customer actions"
                           >
+                            <s-button icon="edit">Rename</s-button>
                             <s-button icon="toggle-off">Deactivate</s-button>
                             <s-button icon="duplicate">Duplicate</s-button>
                             <s-button icon="delete" tone="critical">
-                              Delete
+                              Remove
                             </s-button>
                           </s-menu>
                           <button
