@@ -137,11 +137,39 @@ export default function LabelEditor() {
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("11:00");
   const [endPeriod, setEndPeriod] = useState("AM");
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [modalSelected, setModalSelected] = useState([]);
+  const [activeStatus, setActiveStatus] = useState("Active");
   const alignMenuRef = useRef(null);
   const fontMenuRef = useRef(null);
   const emojiMenuRef = useRef(null);
   const variableMenuRef = useRef(null);
   const textareaRef = useRef(null);
+
+  const modalBadges = [
+    { id: 1, title: 'Badge 1', url: TrustBadge1 },
+    { id: 2, title: 'Badge 2', url: TrustBadge2 },
+    { id: 3, title: 'Badge 3', url: TrustBadge3 },
+    { id: 4, title: 'Badge 4', url: TrustBadge4 },
+    { id: 5, title: 'Badge 5', url: TrustBadge5 },
+  ];
+
+  const toggleModalBadge = (url) => {
+    if (type !== 'badgeGroup') return;
+
+    setModalSelected((prev) => {
+      if (prev.includes(url)) {
+        return prev.filter((i) => i !== url);
+      }
+
+      if (prev.length >= 6) {
+        alert('Maximum 6 badges allowed');
+        return prev;
+      }
+
+      return [...prev, url];
+    });
+  };
 
   useEffect(() => {
     const link = document.createElement("link");
@@ -286,6 +314,23 @@ export default function LabelEditor() {
     }
   };
 
+  const handleImageSelect = (url) => {
+    if (type !== 'badgeGroup') return;
+
+    setSelectedImages((prev) => {
+      if (prev.includes(url)) {
+        return prev.filter((i) => i !== url);
+      }
+
+      if (prev.length >= 6) {
+        alert('Maximum 6 badges allowed');
+        return prev;
+      }
+
+      return [...prev, url];
+    });
+  };
+
   const getPositionClasses = (pos) => {
     const map = {
       "top-left": "top-0 left-0",
@@ -345,7 +390,7 @@ export default function LabelEditor() {
   };
 
   return (
-    <s-page heading="Seliqo Label" inlineSize="large">
+    <s-page heading="Seliqo Product Labels & Badges" inlineSize="large">
       <div className="flex items-center justify-center md:justify-start gap-2 py-3">
         <div className="w-[120px] md:w-[250px]">
           <s-text-field
@@ -363,10 +408,34 @@ export default function LabelEditor() {
           />
         </div>
         <div className="w-[120px] md:w-[250px]">
-          <s-number-field placeholder="1" min={0} max={100} />
+          <s-number-field placeholder="Priority: 1" min={0} max={100} />
         </div>
 
-        <s-badge tone="success">Active</s-badge>
+        <div className="flex justify-center">
+          <div className="inline-flex border border-gray-300 rounded-lg bg-white overflow-hidden">
+            <button
+              onClick={() => setActiveStatus("Active")}
+              className={`px-3 py-1 text-[12px] font-medium transition
+            ${activeStatus === "Active"
+                  ? "bg-[#c2ecd3] text-[#0C5132]"
+                  : "bg-white text-gray-700"
+                }`}
+            >
+              Active
+            </button>
+
+            <button
+              onClick={() => setActiveStatus("Inactive")}
+              className={`px-3 py-1 text-[12px] font-medium transition
+            ${activeStatus === "Inactive"
+                  ? "bg-gray-300 text-gray-800"
+                  : "bg-white text-gray-700"
+                }`}
+            >
+              Inactive
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-wrap bg-white border rounded-xl gap-5 p-3 md:p-5">
@@ -423,22 +492,27 @@ export default function LabelEditor() {
                   }
                   </p>
                   {(type === 'badgeGroup' || type === 'labelGroup') ?
-                    <div className="grid grid-cols-5 gap-3 p-2 max-h-[150px] overflow-y-auto border rounded-lg p-4" style={{ scrollbarWidth: 'thin' }}>
+                    <div className="grid grid-cols-5 gap-3 p-4 max-h-[150px] overflow-y-auto border rounded-lg" style={{ scrollbarWidth: 'thin' }}>
                       {findTrustImage?.slice(0, 4).map((img) => (
                         <div
                           key={img.id}
-                          onClick={() => setSelectedImageUrl(img.url)}
-                          className={`min-w-[56px] h-[56px] border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden ${selectedImageUrl === img.url ? 'border-blue-600 bg-blue-50' : 'border-gray-100'
-                            }`}
+                          onClick={() => handleImageSelect(img.url)}
+                          className={`min-w-[56px] h-[56px] rounded-lg flex items-center justify-center cursor-pointer
+                            ${selectedImages.includes(img.url)
+                              ? 'border-blue-600 bg-blue-50'
+                              : 'border border-gray-200'
+                            }
+                          `}
                         >
-                          <img src={img.url} alt={img.id} className="w-10 h-10 object-contain" />
+                          <img src={img.url} className="w-10 h-10 object-contain" />
                         </div>
                       ))}
                       <div className="min-w-[56px] h-[56px]">
                         <button
                           commandFor="modal"
                           command="--show"
-                          class="w-[56px] h-[56px] flex items-center justify-center border border-dashed rounded-lg"
+                          onClick={() => setModalSelected(selectedImages)}
+                          className="w-[56px] h-[56px] flex items-center justify-center border border-dashed rounded-lg"
                         >
                           <s-icon type="plus" size="large" />
                         </button>
@@ -464,11 +538,10 @@ export default function LabelEditor() {
                           onClick={() => setLabelType('image')}
                           className={`${labelType === 'image' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
                         >
-
                           {type === 'labels'
                             ? 'Readymade image label'
                             : type === 'badges'
-                              ? 'Readymade image label'
+                              ? 'Readymade image badge'
                               : type === 'labelGroup'
                                 ? 'Readymade image label'
                                 : type === 'badgeGroup'
@@ -555,9 +628,9 @@ export default function LabelEditor() {
                         </p>
                         <div className='border rounded-lg'>
                           <div className='flex gap-[6px] border-b p-2 bg-[#FAFAFA] items-center'>
-                            <button onClick={() => setBold((prev) => !prev)}><s-icon type='text-bold' /></button>
-                            <button onClick={() => setItalic((prev) => !prev)}><s-icon type='text-italic' /></button>
-                            <button onClick={() => setUnderline((prev) => !prev)}><s-icon type='text-underline' /></button>
+                            <button className={`p-[2px] ${bold ? 'bg-gray-200 rounded-md' : ""}`} onClick={() => setBold((prev) => !prev)}><s-icon type='text-bold' /></button>
+                            <button className={`p-[2px] ${italic ? 'bg-gray-200 rounded-md' : ""}`} onClick={() => setItalic((prev) => !prev)}><s-icon type='text-italic' /></button>
+                            <button className={`p-[2px] ${underline ? 'bg-gray-200 rounded-md' : ""}`} onClick={() => setUnderline((prev) => !prev)}><s-icon type='text-underline' /></button>
                             <div ref={alignMenuRef} className="relative inline-block">
                               <button
                                 onClick={() => setOpenAlignMenu((prev) => !prev)}
@@ -976,7 +1049,17 @@ export default function LabelEditor() {
 
                         <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                           <div>
-                            <p className="mb-1">Badge width</p>
+                            <p className="mb-1">
+                              {type === 'labels'
+                                ? 'Label width'
+                                : type === 'badges'
+                                  ? 'Badge width'
+                                  : type === 'badgeGroup'
+                                    ? 'Badge width'
+                                    : type === 'labelGroup'
+                                      ? 'Label width'
+                                      : ''}
+                            </p>
                             <s-number-field
                               value={badgeWidth}
                               suffix="Px"
@@ -986,7 +1069,17 @@ export default function LabelEditor() {
                           </div>
 
                           <div>
-                            <p className="mb-1">Badge height</p>
+                            <p className="mb-1">
+                              {type === 'labels'
+                                ? 'Label height'
+                                : type === 'badges'
+                                  ? 'Badge height'
+                                  : type === 'badgeGroup'
+                                    ? 'Badge height'
+                                    : type === 'labelGroup'
+                                      ? 'Label height'
+                                      : ''}
+                            </p>
                             <s-number-field
                               value={badgeHeight}
                               suffix="Px"
@@ -1006,7 +1099,17 @@ export default function LabelEditor() {
                           </div>
 
                           <div>
-                            <p className="mb-1">Badge opacity</p>
+                            <p className="mb-1">
+                              {type === 'labels'
+                                ? 'Label opacity'
+                                : type === 'badges'
+                                  ? 'Badge opacity'
+                                  : type === 'badgeGroup'
+                                    ? 'Badge opacity'
+                                    : type === 'labelGroup'
+                                      ? 'Label opacity'
+                                      : ''}
+                            </p>
                             <s-number-field
                               value={badgeOpacity}
                               suffix="%"
@@ -1066,7 +1169,13 @@ export default function LabelEditor() {
 
                         <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                           <div>
-                            <p className="mb-1">Gap between the badge</p>
+                            <p className="mb-1">
+                              {type === 'badgeGroup'
+                                ? 'Gap between the badge'
+                                : type === 'labelGroup'
+                                  ? 'Gap between the label'
+                                  : ''}
+                            </p>
                             <s-number-field
                               value={badgeWidth}
                               suffix="Px"
@@ -1076,7 +1185,13 @@ export default function LabelEditor() {
                           </div>
 
                           <div>
-                            <p className="mb-1">Badge height</p>
+                            <p className="mb-1">
+                              {type === 'badgeGroup'
+                                ? 'Badge height'
+                                : type === 'labelGroup'
+                                  ? 'Label height'
+                                  : ''}
+                            </p>
                             <s-number-field
                               value={badgeHeight}
                               suffix="Px"
@@ -1292,61 +1407,33 @@ export default function LabelEditor() {
                     </s-select>
                   </div>
 
-                  <s-modal id="modal" heading="Add product" padding='none'>
-                    <div className='p-3 border-b'>
+                  {/* <s-modal id="modal" heading="Add badges" padding="none">
+                    <div className="p-3 border-b">
                       <s-search-field
                         label="Search"
                         labelAccessibilityVisibility="exclusive"
-                        placeholder="Search product"
+                        placeholder="Search badge"
                       />
                     </div>
 
-                    <div className='mt-3 space-y-3'>
-                      <div className="flex items-center gap-3 border-b pb-3 px-4">
-                        <s-checkbox />
-                        <s-thumbnail
-                          alt="White sneakers"
-                          src="https://cdn.shopify.com/static/images/polaris/thumbnail-wc_src.jpg"
-                          size='small'
-                        />
-                        <span className="text-sm font-medium">Product 1</span>
-                      </div>
-                      <div className="flex items-center gap-3 border-b pb-3 px-4">
-                        <s-checkbox />
-                        <s-thumbnail
-                          alt="White sneakers"
-                          src="https://cdn.shopify.com/static/images/polaris/thumbnail-wc_src.jpg"
-                          size='small'
-                        />
-                        <span className="text-sm font-medium">Product 1</span>
-                      </div>
-                      <div className="flex items-center gap-3 border-b pb-3 px-4">
-                        <s-checkbox />
-                        <s-thumbnail
-                          alt="White sneakers"
-                          src="https://cdn.shopify.com/static/images/polaris/thumbnail-wc_src.jpg"
-                          size='small'
-                        />
-                        <span className="text-sm font-medium">Product 1</span>
-                      </div>
-                      <div className="flex items-center gap-3 border-b pb-3 px-4">
-                        <s-checkbox />
-                        <s-thumbnail
-                          alt="White sneakers"
-                          src="https://cdn.shopify.com/static/images/polaris/thumbnail-wc_src.jpg"
-                          size='small'
-                        />
-                        <span className="text-sm font-medium">Product 1</span>
-                      </div>
-                      <div className="flex items-center gap-3 pb-3 px-4">
-                        <s-checkbox />
-                        <s-thumbnail
-                          alt="White sneakers"
-                          src="https://cdn.shopify.com/static/images/polaris/thumbnail-wc_src.jpg"
-                          size='small'
-                        />
-                        <span className="text-sm font-medium">Product 1</span>
-                      </div>
+                    <div className="mt-3 space-y-3">
+                      {modalBadges.map((badge) => (
+                        <div
+                          key={badge.id}
+                          className="flex items-center gap-3 border-b pb-3 px-4 cursor-pointer"
+                          onClick={() => toggleModalBadge(badge.url)}
+                        >
+                          <s-checkbox checked={modalSelected.includes(badge.url)} />
+
+                          <s-thumbnail
+                            alt={badge.title}
+                            src={badge.url}
+                            size="small"
+                          />
+
+                          <span className="text-sm font-medium">{badge.title}</span>
+                        </div>
+                      ))}
                     </div>
 
                     <s-button slot="secondary-actions" commandFor="modal" command="--hide">
@@ -1355,12 +1442,15 @@ export default function LabelEditor() {
                     <s-button
                       slot="primary-action"
                       variant="primary"
+                      onClick={() => {
+                        setSelectedImages(modalSelected);
+                      }}
                       commandFor="modal"
                       command="--hide"
                     >
                       Add
                     </s-button>
-                  </s-modal>
+                  </s-modal> */}
 
                   <div className='mb-3'><s-divider /></div>
 
@@ -1451,20 +1541,105 @@ export default function LabelEditor() {
                 </s-menu>
               </div>
 
-              <div className="hidden md:flex items-center gap-1 bg-[#ebebeb] p-1 rounded-md">
-                <div
-                  onClick={() => setActive("desktop")}
-                  className={`cursor-pointer p-1 rounded-md transition-all ${active === "desktop" ? "bg-white shadow-sm" : "opacity-60"
-                    }`}
-                >
-                  <s-icon type="desktop" />
+              <div className='flex gap-5 items-center'>
+                <div className='border-r pr-3'>
+                  <button
+                  className='hover:bg-[#EBEBEB] p-1 rounded-md'
+                    commandFor="preview-modal"
+                    command="--show"
+                    onClick={() => setModalSelected(selectedImages)}
+                  >
+                    <s-icon type='eye-check-mark' />
+                  </button>
                 </div>
-                <div
-                  onClick={() => setActive("mobile")}
-                  className={`cursor-pointer p-1 rounded-md transition-all ${active === "mobile" ? "bg-white shadow-sm" : "opacity-60"
-                    }`}
-                >
-                  <s-icon type="mobile" />
+                <s-modal id="preview-modal" heading="Add product" padding="none">
+                  <div className="p-3 border-b flex flex-col gap-2">
+                    <div className="flex gap-3 items-center">
+                      <div className="w-[65%]">
+                        <s-search-field
+                          label="Search"
+                          labelAccessibilityVisibility="exclusive"
+                          placeholder="Search products"
+                        />
+                      </div>
+                      <div className="w-[35%] mt-[-4px]">
+                        <s-select>
+                          <s-option value="1">All</s-option>
+                          <s-option value="2">Product title</s-option>
+                          <s-option value="3">Product ID</s-option>
+                          <s-option value="4">Barcode</s-option>
+                          <s-option value="5">SKU</s-option>
+                        </s-select>
+                      </div>
+                    </div>
+                    <div>
+                      <button
+                        className="border border-dashed border-gray-300 px-[5px] py-[2px] rounded-lg flex items-center gap-1"
+                        commandFor="filter"
+                        command="--show"
+                      >
+                        Add filter
+                        <s-icon type="plus" />
+                      </button>
+                      <s-menu id="filter" accessibilityLabel="Customer actions">
+                        <s-button>Categories</s-button>
+                        <s-button>Collection</s-button>
+                        <s-button>Types</s-button>
+                        <s-button>Tags</s-button>
+                        <s-button>Vendors</s-button>
+                      </s-menu>
+                    </div>
+                  </div>
+                  <div className="mt-3 space-y-3">
+                    {modalBadges.map((badge) => (
+                      <div
+                        key={badge.id}
+                        className="flex items-center gap-3 border-b pb-3 px-4 cursor-pointer"
+                        onClick={() => toggleModalBadge(badge.url)}
+                      >
+                        <s-checkbox checked={modalSelected.includes(badge.url)} />
+
+                        <s-thumbnail
+                          alt={badge.title}
+                          src={badge.url}
+                          size="small"
+                        />
+
+                        <span className="text-sm font-medium">{badge.title}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <s-button slot="secondary-actions" commandFor="modal" command="--hide">
+                    Close
+                  </s-button>
+                  <s-button
+                    slot="primary-action"
+                    variant="primary"
+                    onClick={() => {
+                      setSelectedImages(modalSelected);
+                    }}
+                    commandFor="modal"
+                    command="--hide"
+                  >
+                    Add
+                  </s-button>
+                </s-modal>
+                <div className="hidden md:flex items-center gap-1 bg-[#ebebeb] p-1 rounded-md">
+                  <div
+                    onClick={() => setActive("desktop")}
+                    className={`cursor-pointer p-1 rounded-md transition-all ${active === "desktop" ? "bg-white shadow-sm" : "opacity-60"
+                      }`}
+                  >
+                    <s-icon type="desktop" />
+                  </div>
+                  <div
+                    onClick={() => setActive("mobile")}
+                    className={`cursor-pointer p-1 rounded-md transition-all ${active === "mobile" ? "bg-white shadow-sm" : "opacity-60"
+                      }`}
+                  >
+                    <s-icon type="mobile" />
+                  </div>
                 </div>
               </div>
 
@@ -1520,6 +1695,7 @@ export default function LabelEditor() {
                                   style={{ color: textColor, textAlign: alignment }}
                                 >
                                   <span
+                                    title={isTooltipEnabled ? labelTooltip : ""}
                                     tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
                                     role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
                                     onClick={() => {
@@ -1548,7 +1724,25 @@ export default function LabelEditor() {
                                 </div>
                               ) : (
                                 selectedImageUrl && (
-                                  <img src={selectedImageUrl} alt="label" className="max-w-full max-h-full object-contain" />
+                                  <div
+                                    title={isTooltipEnabled ? labelTooltip : ""}
+                                    tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                    role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                    onClick={() => {
+                                      if (isActionLinkEnabled && actionLinkUrl) {
+                                        window.open(actionLinkUrl, "_blank");
+                                      }
+                                    }}
+                                    className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                      } flex justify-center items-center`}
+                                  >
+                                    <img
+                                      src={selectedImageUrl}
+                                      alt="label"
+                                      className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14 mt-5'
+                                        } object-contain`}
+                                    />
+                                  </div>
                                 )
                               )}
                             </div>}
@@ -1561,7 +1755,7 @@ export default function LabelEditor() {
                           </div>
 
                           <div className="mt-3 space-y-1">
-                            <div className='flex flex-col gap-2'>
+                            <div className='flex flex-col gap-2 mb-3'>
                               <div className='flex gap-3 items-center'>
                                 {type === 'badges' && <div
                                   className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
@@ -1629,7 +1823,25 @@ export default function LabelEditor() {
                                     </div>
                                   ) : (
                                     selectedImageUrl && (
-                                      <img src={selectedImageUrl} alt="label" className="max-w-full max-h-full object-contain" />
+                                      <div
+                                        title={isTooltipEnabled ? labelTooltip : ""}
+                                        tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                        role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                        onClick={() => {
+                                          if (isActionLinkEnabled && actionLinkUrl) {
+                                            window.open(actionLinkUrl, "_blank");
+                                          }
+                                        }}
+                                        className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                          } flex justify-center items-center`}
+                                      >
+                                        <img
+                                          src={selectedImageUrl}
+                                          alt="label"
+                                          className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14 mt-5'
+                                            } object-contain`}
+                                        />
+                                      </div>
                                     )
                                   )}
                                 </div>}
@@ -1637,14 +1849,18 @@ export default function LabelEditor() {
                                   Demo product
                                 </p>
                               </div>
-                              {type === 'badgeGroup' && selectedImageUrl &&
-                                <div className='flex gap-2'>
-                                  <img src={selectedImageUrl} alt="label" className="w-10 h-10 object-contain" />
-                                  <img src={selectedImageUrl} alt="label" className="w-10 h-10 object-contain" />
-                                  <img src={selectedImageUrl} alt="label" className="w-10 h-10 object-contain" />
-                                  <img src={selectedImageUrl} alt="label" className="w-10 h-10 object-contain" />
+                              {type === 'badgeGroup' && selectedImages.length > 0 && (
+                                <div className="flex gap-2">
+                                  {selectedImages.map((url, index) => (
+                                    <img
+                                      key={index}
+                                      src={url}
+                                      alt="badge"
+                                      className="w-10 h-10 object-contain"
+                                    />
+                                  ))}
                                 </div>
-                              }
+                              )}
                             </div>
                             <p className={`${active === 'mobile' ? 'text-[12px]' : 'text-gray-600'} font-medium`}>$16.00</p>
                           </div>
@@ -1728,7 +1944,25 @@ export default function LabelEditor() {
                           </div>
                         ) : (
                           selectedImageUrl && (
-                            <img src={selectedImageUrl} alt="label" className="max-w-full max-h-full object-contain" />
+                            <div
+                              title={isTooltipEnabled ? labelTooltip : ""}
+                              tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                              role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                              onClick={() => {
+                                if (isActionLinkEnabled && actionLinkUrl) {
+                                  window.open(actionLinkUrl, "_blank");
+                                }
+                              }}
+                              className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                } flex justify-center items-center`}
+                            >
+                              <img
+                                src={selectedImageUrl}
+                                alt="label"
+                                className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14 mt-5'
+                                  } object-contain`}
+                              />
+                            </div>
                           )
                         )}
                       </div>}
@@ -1803,21 +2037,34 @@ export default function LabelEditor() {
                             </div>
                           ) : (
                             selectedImageUrl && (
-                              <img src={selectedImageUrl} alt="label" className="max-w-full max-h-full object-contain" />
+                              <div
+                                title={isTooltipEnabled ? labelTooltip : ""}
+                                tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                onClick={() => {
+                                  if (isActionLinkEnabled && actionLinkUrl) {
+                                    window.open(actionLinkUrl, "_blank");
+                                  }
+                                }}
+                                className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                  } flex justify-center items-center`}
+                              >
+                                <img
+                                  src={selectedImageUrl}
+                                  alt="label"
+                                  className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14 mt-5'
+                                    } object-contain`}
+                                />
+                              </div>
                             )
                           )}
                         </div>
                       </div>}
-                      {type === 'badgeGroup' && (
-                        <div>
-                          {selectedImageUrl && (
-                            <div className='flex gap-3'>
-                              <img src={selectedImageUrl} alt="label" className="w-14 h-14 object-contain" />
-                              <img src={selectedImageUrl} alt="label" className="w-14 h-14 object-contain" />
-                              <img src={selectedImageUrl} alt="label" className="w-14 h-14 object-contain" />
-                              <img src={selectedImageUrl} alt="label" className="w-14 h-14 object-contain" />
-                            </div>
-                          )}
+                      {type === 'badgeGroup' && selectedImages.length > 0 && (
+                        <div className="flex gap-2">
+                          {selectedImages.map((url, index) => (
+                            <img key={index} src={url} className="w-10 h-10 object-contain" />
+                          ))}
                         </div>
                       )}
                       <div className="space-y-4 max-w-[420px] pt-2">

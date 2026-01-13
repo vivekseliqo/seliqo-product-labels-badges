@@ -19,9 +19,9 @@ export default function Index() {
           <div className="space-y-3">
             <div>
               <div className="pb-2">
-                <s-text type="strong">Setup guide</s-text>
+                <p className="font-bold">Setup guide</p>
               </div>
-              <s-paragraph>Let’s get your app ready</s-paragraph>
+              <s-paragraph>Let’s get your app ready.</s-paragraph>
             </div>
 
             <div className="pb-3">
@@ -103,7 +103,7 @@ export default function Index() {
         <s-card>
           <div className="flex justify-between items-center mb-4">
             <div className="flex gap-2 items-center">
-              <s-text type="strong">Analytics</s-text>
+              <p className="font-bold">Analytics</p>
               <s-badge tone="info">This month</s-badge>
             </div>
             {/* <s-button variant="secondary" onClick={() => setOpenDatePicker(!openDatePicker)}>
@@ -158,7 +158,7 @@ export default function Index() {
         <s-card>
           <div className="flex justify-between items-center mb-4">
             <div className="flex gap-2 items-center">
-              <s-text type="strong">Main features</s-text>
+              <p className="font-bold">Main features</p>
             </div>
           </div>
 
