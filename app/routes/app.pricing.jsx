@@ -76,8 +76,7 @@ export default function Pricing() {
             <div className="h-full flex flex-col justify-between">
               <div className="space-y-4">
                 <div>
-                  <s-text type="strong">Starter</s-text>
-                  <br />
+                  <p className="font-bold">Starter</p>
                   <s-text variant="bodySm">
                     Up to <strong>20,000</strong> monthly views
                   </s-text>
@@ -112,7 +111,7 @@ export default function Pricing() {
             <div className="h-full flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <s-text type="strong">Essential</s-text>
+                  <p className="font-bold">Essential</p>
                   <s-badge tone="success">Most popular</s-badge>
                 </div>
 
@@ -150,8 +149,7 @@ export default function Pricing() {
             <div className="h-full flex flex-col justify-between">
               <div className="space-y-4">
                 <div>
-                  <s-text type="strong">Professional</s-text>
-                  <br />
+                  <p className="font-bold">Professional</p>
                   <s-text variant="bodySm">
                     <strong>Unlimited</strong> views
                   </s-text>

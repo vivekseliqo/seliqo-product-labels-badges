@@ -104,14 +104,14 @@ export default function LabelEditor() {
   const [color2, setColor2] = useState('#CB72FF');
   const [textColor, setTextColor] = useState('#ffffff');
   const [shape, setShape] = useState('rect');
-  const [labelType, setLabelType] = useState(type === 'labels' ? 'shape' : 'image');
+  const [labelType, setLabelType] = useState('shape');
   const [selectedImageUrl, setSelectedImageUrl] = useState(type === 'badges' ? Label6 : TrustBadge1);
   const [previewPage, setPreviewPage] = useState("collection");
   const [productAlign, setProductAlign] = useState("left");
   const [selectedDropdown, setSelectedDropdown] = useState("above-title");
   const [selectedDisplayType, setSelectedDisplayType] = useState('horizontal');
-  const [badgeWidth, setBadgeWidth] = useState(90);
-  const [badgeHeight, setBadgeHeight] = useState(35);
+  const [badgeWidth, setBadgeWidth] = useState(110);
+  const [badgeHeight, setBadgeHeight] = useState(45);
   const [badgeRadius, setBadgeRadius] = useState(0);
   const [badgeOpacity, setBadgeOpacity] = useState(100);
   const [badgeMargin, setBadgeMargin] = useState(0);
@@ -145,6 +145,11 @@ export default function LabelEditor() {
   const emojiMenuRef = useRef(null);
   const variableMenuRef = useRef(null);
   const textareaRef = useRef(null);
+
+  useEffect(() => {
+    setBadgeWidth(active === 'desktop' ? 110 : 70);
+    setBadgeHeight(active === 'desktop' ? 45 : 30);
+  }, [active]);
 
   const modalBadges = [
     { id: 1, title: 'Badge 1', url: TrustBadge1 },
@@ -389,6 +394,45 @@ export default function LabelEditor() {
     }, {});
   };
 
+  const SHAPE_CONFIG = {
+    rect: {
+      forceSquare: false,
+      defaultRadius: 4,
+      paddingMultiplier: 1,
+    },
+    'rect-pill': {
+      forceSquare: true,
+      defaultRadius: 999,
+      paddingMultiplier: 1.2,
+    },
+    circle: {
+      forceSquare: true,
+      defaultRadius: 999,
+      paddingMultiplier: 1,
+    },
+    pentagon: {
+      forceSquare: true,
+      defaultRadius: 0,
+      paddingMultiplier: 1.4,
+    },
+    star: {
+      forceSquare: true,
+      defaultRadius: 0,
+      paddingMultiplier: 1.5,
+    },
+    ribbon: {
+      forceSquare: false,
+      defaultRadius: 0,
+      paddingMultiplier: 1.2,
+    },
+  };
+
+  const shapeConfig = SHAPE_CONFIG[shape];
+  const baseSize = Math.min(badgeWidth, badgeHeight);
+  const finalWidth = shapeConfig.forceSquare ? baseSize : badgeWidth;
+  const finalHeight = shapeConfig.forceSquare ? baseSize : badgeHeight;
+  const finalPadding = badgePadding * shapeConfig.paddingMultiplier;
+
   return (
     <s-page heading="Seliqo Product Labels & Badges" inlineSize="large">
       <div className="flex items-center justify-center md:justify-start gap-2 py-3">
@@ -417,7 +461,7 @@ export default function LabelEditor() {
               onClick={() => setActiveStatus("Active")}
               className={`px-3 py-1 text-[12px] font-medium transition
             ${activeStatus === "Active"
-                  ? "bg-[#c2ecd3] text-[#0C5132]"
+                  ? "bg-[#AFFEBF] text-[#1F6A56]"
                   : "bg-white text-gray-700"
                 }`}
             >
@@ -557,7 +601,7 @@ export default function LabelEditor() {
                               <div
                                 key={s}
                                 onClick={() => setShape(s)}
-                                className={`min-w-[56px] h-[56px] border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer transition-all ${shape === s ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-300'
+                                className={`min-w-[56px] h-[56px] border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-105 ${shape === s ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-300'
                                   }`}
                               >
                                 <div
@@ -601,7 +645,7 @@ export default function LabelEditor() {
                             <div
                               key={img.id}
                               onClick={() => setSelectedImageUrl(img.url)}
-                              className={`min-w-[56px] h-[56px] border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden ${selectedImageUrl === img.url ? 'border-blue-600 bg-blue-50' : 'border-gray-100'
+                              className={`min-w-[56px] h-[56px] border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden transition-transform duration-300 hover:scale-105 ${selectedImageUrl === img.url ? 'border-blue-600 bg-blue-50' : 'border-gray-100'
                                 }`}
                             >
                               <img src={img.url} alt={img.id} className="w-10 h-10 object-contain" />
@@ -943,7 +987,53 @@ export default function LabelEditor() {
                     <p className="font-semibold mb-2">
                       {type === 'labels' ? 'Label position' : type === 'badges' ? 'Badge position' : type === 'badgeGroup' ? 'Badge position' : type === 'labelGroup' ? 'Label position' : ''}
                     </p>
-                    {(type === "labels" || type === "badges") && <div className="relative bg-[#F0ECE8] p-4 rounded-xl w-[260px]">
+                    {type === 'badges' && <div>
+                      <div className='mb-3'>
+                        <p className='mb-1'>
+                          {type === 'labels' ? 'Label to display' : type === 'badges' ? 'Badge to display' : type === 'badgeGroup' ? 'Badge to display' : type === 'labelGroup' ? 'Label to display' : ''}
+                        </p>
+                        <s-select
+                          value={selectedDropdown}
+                          onChange={(val) => {
+                            setSelectedDropdown(val);
+                            const pos = labelPositionsDropdown.find(p => p.id === val);
+                            if (pos) setSelected(pos.className);
+                          }}
+                        >
+                          {labelPositionsDropdown.map((pos) => (
+                            <s-option key={pos.id} value={pos.id}>
+                              {pos.label}
+                            </s-option>
+                          ))}
+                        </s-select>
+                      </div>
+                      <div className="bg-gray-100 rounded-xl p-1 flex">
+                        <button
+                          onClick={() => setProductAlign("left")}
+                          className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "left" ? "bg-white shadow-sm" : ""
+                            }`}
+                        >
+                          <s-icon type="arrow-left" />
+                        </button>
+
+                        <button
+                          onClick={() => setProductAlign("center")}
+                          className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "center" ? "bg-white shadow-sm" : ""
+                            }`}
+                        >
+                          <img src={Blank} className="w-5 h-5" />
+                        </button>
+
+                        <button
+                          onClick={() => setProductAlign("right")}
+                          className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "right" ? "bg-white shadow-sm" : ""
+                            }`}
+                        >
+                          <s-icon type="arrow-right" />
+                        </button>
+                      </div>
+                    </div>}
+                    {(type === "labels") && <div className="relative bg-[#F0ECE8] p-4 rounded-xl w-[260px]">
                       <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
                         <img
                           src={productFrame}
@@ -1544,7 +1634,7 @@ export default function LabelEditor() {
               <div className='flex gap-5 items-center'>
                 <div className='border-r pr-3'>
                   <button
-                  className='hover:bg-[#EBEBEB] p-1 rounded-md'
+                    className='hover:bg-[#EBEBEB] p-1 rounded-md'
                     commandFor="preview-modal"
                     command="--show"
                     onClick={() => setModalSelected(selectedImages)}
@@ -1647,7 +1737,7 @@ export default function LabelEditor() {
           </div>
           <div className={`transition-all duration-500 ease-in-out ${active === 'mobile' ? 'w-[320px] md:w-[375px] min-h-[667px] shadow-2xl border-[6px] border-gray-800 rounded-[3rem] mb-10 overflow-hidden bg-white mt-5' : 'w-full'}`}>
             <s-card>
-              <div className={`space-y-4 bg-white rounded-2xl p-3 md:p-5 ${active === 'mobile' ? 'm-0' : 'm-2 md:m-5'}`}>
+              <div className={`space-y-4 bg-white rounded-2xl shadow-sm border p-3 md:p-5 ${active === 'mobile' ? 'm-0' : 'm-2 md:m-5'}`}>
                 {previewPage === "collection" && (
                   <>
                     <p className="font-semibold text-xl">Your products</p>
@@ -1655,15 +1745,15 @@ export default function LabelEditor() {
                     <div className={active === 'mobile' ? "grid grid-cols-2 gap-3" : "grid pb-4 grid-cols-2 md:grid-cols-4 gap-4"}>
                       {[1, 2, 3, 4].map((item) => (
                         <div key={item} className="flex-shrink-0">
-                          <div className={`relative bg-[#E3EDFB] rounded-lg flex items-center justify-center overflow-hidden transition-all`}>
+                          <div className={`relative bg-[#E3EDFB] flex items-center justify-center overflow-hidden transition-all`}>
                             {type === 'labels' && <div
                               className={`absolute z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
                               style={{
-                                width: `${badgeWidth}px`,
-                                height: `${badgeHeight}px`,
+                                width: `${finalWidth}px`,
+                                height: `${finalHeight}px`,
                                 opacity: badgeOpacity / 100,
                                 margin: `${badgeMargin}px`,
-                                padding: `${badgePadding}px`,
+                                padding: `${finalPadding}px`,
                                 borderRadius: `${badgeRadius}px`,
                                 ...(labelType === 'shape'
                                   ? {
@@ -1676,11 +1766,11 @@ export default function LabelEditor() {
                                           : "transparent",
 
                                     WebkitMaskImage: `url(${shapeImages[shape]})`,
-                                    WebkitMaskSize: 'contain',
+                                    WebkitMaskSize: '100% 100%',
                                     WebkitMaskRepeat: 'no-repeat',
                                     WebkitMaskPosition: 'center',
                                     maskImage: `url(${shapeImages[shape]})`,
-                                    maskSize: 'contain',
+                                    maskSize: '100% 100%',
                                     maskRepeat: 'no-repeat',
                                     maskPosition: 'center',
                                   }
@@ -1739,7 +1829,7 @@ export default function LabelEditor() {
                                     <img
                                       src={selectedImageUrl}
                                       alt="label"
-                                      className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14 mt-5'
+                                      className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
                                         } object-contain`}
                                     />
                                   </div>
@@ -1760,11 +1850,11 @@ export default function LabelEditor() {
                                 {type === 'badges' && <div
                                   className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
                                   style={{
-                                    width: `${badgeWidth}px`,
-                                    height: `${badgeHeight}px`,
+                                    width: `${finalWidth}px`,
+                                    height: `${finalHeight}px`,
                                     opacity: badgeOpacity / 100,
                                     margin: `${badgeMargin}px`,
-                                    padding: `${badgePadding}px`,
+                                    padding: `${finalPadding}px`,
                                     borderRadius: `${badgeRadius}px`,
                                     ...(labelType === 'shape'
                                       ? {
@@ -1776,11 +1866,11 @@ export default function LabelEditor() {
                                               : "transparent",
 
                                         WebkitMaskImage: `url(${shapeImages[shape]})`,
-                                        WebkitMaskSize: 'contain',
+                                        WebkitMaskSize: '100% 100%',
                                         WebkitMaskRepeat: 'no-repeat',
                                         WebkitMaskPosition: 'center',
                                         maskImage: `url(${shapeImages[shape]})`,
-                                        maskSize: 'contain',
+                                        maskSize: '100% 100%',
                                         maskRepeat: 'no-repeat',
                                         maskPosition: 'center',
                                       }
@@ -1838,7 +1928,7 @@ export default function LabelEditor() {
                                         <img
                                           src={selectedImageUrl}
                                           alt="label"
-                                          className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14 mt-5'
+                                          className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
                                             } object-contain`}
                                         />
                                       </div>
@@ -1881,11 +1971,11 @@ export default function LabelEditor() {
                       {(type === 'labels') && <div
                         className={`absolute z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
                         style={{
-                          width: `${badgeWidth}px`,
-                          height: `${badgeHeight}px`,
+                          width: `${finalWidth}px`,
+                          height: `${finalHeight}px`,
                           opacity: badgeOpacity / 100,
                           margin: `${badgeMargin}px`,
-                          padding: `${badgePadding}px`,
+                          padding: `${finalPadding}px`,
                           borderRadius: `${badgeRadius}px`,
                           ...(labelType === 'shape'
                             ? {
@@ -1897,11 +1987,11 @@ export default function LabelEditor() {
                                     : "transparent",
 
                               WebkitMaskImage: `url(${shapeImages[shape]})`,
-                              WebkitMaskSize: 'contain',
+                              WebkitMaskSize: '100% 100%',
                               WebkitMaskRepeat: 'no-repeat',
                               WebkitMaskPosition: 'center',
                               maskImage: `url(${shapeImages[shape]})`,
-                              maskSize: 'contain',
+                              maskSize: '100% 100%',
                               maskRepeat: 'no-repeat',
                               maskPosition: 'center',
                             }
@@ -1959,7 +2049,7 @@ export default function LabelEditor() {
                               <img
                                 src={selectedImageUrl}
                                 alt="label"
-                                className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14 mt-5'
+                                className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
                                   } object-contain`}
                               />
                             </div>
@@ -1976,11 +2066,11 @@ export default function LabelEditor() {
                         <div
                           className="flex items-center"
                           style={{
-                            width: `${badgeWidth}px`,
-                            height: `${badgeHeight}px`,
+                            width: `${finalWidth}px`,
+                            height: `${finalHeight}px`,
                             opacity: badgeOpacity / 100,
                             margin: `${badgeMargin}px`,
-                            padding: `${badgePadding}px`,
+                            padding: `${finalPadding}px`,
                             borderRadius: `${badgeRadius}px`,
                             ...(labelType === 'shape'
                               ? {
@@ -1991,11 +2081,11 @@ export default function LabelEditor() {
                                       ? `linear-gradient(90deg, ${color1}, ${color2})`
                                       : "transparent",
                                 WebkitMaskImage: `url(${shapeImages[shape]})`,
-                                WebkitMaskSize: 'contain',
+                                WebkitMaskSize: '100% 100%',
                                 WebkitMaskRepeat: 'no-repeat',
                                 WebkitMaskPosition: 'center',
                                 maskImage: `url(${shapeImages[shape]})`,
-                                maskSize: 'contain',
+                                maskSize: '100% 100%',
                                 maskRepeat: 'no-repeat',
                                 maskPosition: 'center',
                               }
@@ -2052,7 +2142,7 @@ export default function LabelEditor() {
                                 <img
                                   src={selectedImageUrl}
                                   alt="label"
-                                  className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14 mt-5'
+                                  className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
                                     } object-contain`}
                                 />
                               </div>

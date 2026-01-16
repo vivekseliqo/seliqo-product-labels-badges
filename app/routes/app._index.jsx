@@ -24,7 +24,7 @@ export default function Index() {
               <s-paragraph>Let’s get your app ready.</s-paragraph>
             </div>
 
-            <div className="pb-3">
+            <div>
               <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gray-900 rounded-full transition-all"
