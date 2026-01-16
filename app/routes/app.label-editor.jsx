@@ -32,6 +32,7 @@ import Label22 from '../images/label_22.png'
 import Label23 from '../images/label_23.png'
 import Label24 from '../images/label_24.png'
 import Label25 from '../images/label_25.png'
+import Image from '../images/image.png'
 import TrustBadge1 from '../images/trust_badge_1.png'
 import TrustBadge2 from '../images/trust_badge_2.png'
 import TrustBadge3 from '../images/trust_badge_3.png'
@@ -140,6 +141,8 @@ export default function LabelEditor() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [modalSelected, setModalSelected] = useState([]);
   const [activeStatus, setActiveStatus] = useState("Active");
+  const [selectedOption, setSelectedOption] = useState("All product");
+  const [openDropdown, setOpenDropdown] = useState(false);
   const alignMenuRef = useRef(null);
   const fontMenuRef = useRef(null);
   const emojiMenuRef = useRef(null);
@@ -151,12 +154,25 @@ export default function LabelEditor() {
     setBadgeHeight(active === 'desktop' ? 45 : 30);
   }, [active]);
 
-  const modalBadges = [
+  const addModalBadges = [
     { id: 1, title: 'Badge 1', url: TrustBadge1 },
     { id: 2, title: 'Badge 2', url: TrustBadge2 },
     { id: 3, title: 'Badge 3', url: TrustBadge3 },
     { id: 4, title: 'Badge 4', url: TrustBadge4 },
     { id: 5, title: 'Badge 5', url: TrustBadge5 },
+  ];
+
+  const modalBadges = [
+    { id: 1, title: 'Product 1', url: TrustBadge1 },
+    { id: 2, title: 'Product 2', url: TrustBadge2 },
+    { id: 3, title: 'Product 3', url: TrustBadge3 },
+    { id: 4, title: 'Product 4', url: TrustBadge4 },
+    { id: 5, title: 'Product 5', url: TrustBadge5 },
+  ];
+
+  const specificCollection = [
+    { id: 1, title: 'Specific collection 1', subtitle: '10 product', url: Image },
+    { id: 2, title: 'Specific collection 2', subtitle: '20 product', url: Image }
   ];
 
   const toggleModalBadge = (url) => {
@@ -483,7 +499,6 @@ export default function LabelEditor() {
       </div>
 
       <div className="flex flex-wrap bg-white border rounded-xl gap-5 p-3 md:p-5">
-
         {/* LEFT PANEL */}
         <div>
           <div className="w-full md:w-[370px] 
@@ -553,7 +568,7 @@ export default function LabelEditor() {
                       ))}
                       <div className="min-w-[56px] h-[56px]">
                         <button
-                          commandFor="modal"
+                          commandFor="add-badge-modal"
                           command="--show"
                           onClick={() => setModalSelected(selectedImages)}
                           className="w-[56px] h-[56px] flex items-center justify-center border border-dashed rounded-lg"
@@ -561,9 +576,53 @@ export default function LabelEditor() {
                           <s-icon type="plus" size="large" />
                         </button>
                       </div>
+                      <s-modal id="add-badge-modal" heading="Select badge" padding="none">
+                        <div className="p-3 border-b">
+                          <s-search-field
+                            label="Search"
+                            labelAccessibilityVisibility="exclusive"
+                            placeholder="Search badge"
+                          />
+                        </div>
+
+                        <div className="mt-3 space-y-3">
+                          {addModalBadges.map((badge) => (
+                            <div
+                              key={badge.id}
+                              className="flex items-center gap-3 border-b pb-3 px-4 cursor-pointer"
+                              onClick={() => toggleModalBadge(badge.url)}
+                            >
+                              <s-checkbox checked={modalSelected.includes(badge.url)} />
+
+                              <s-thumbnail
+                                alt={badge.title}
+                                src={badge.url}
+                                size="small"
+                              />
+
+                              <span className="text-sm font-medium">{badge.title}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <s-button slot="secondary-actions" commandFor="add-badge-modal" command="--hide">
+                          Cancel
+                        </s-button>
+                        <s-button
+                          slot="primary-action"
+                          variant="primary"
+                          onClick={() => {
+                            setSelectedImages(modalSelected);
+                          }}
+                          commandFor="add-badge-modal"
+                          command="--hide"
+                        >
+                          Add
+                        </s-button>
+                      </s-modal>
                     </div>
                     : <div className='border rounded-lg mb-3'>
-                      <div className="flex gap-1 mb-4 border-b p-2">
+                      <div className="flex gap-1 border-b p-2">
                         <button
                           onClick={() => setLabelType('shape')}
                           className={`${labelType === 'shape' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
@@ -1487,22 +1546,130 @@ export default function LabelEditor() {
               >
                 <div className="px-4 py-3 space-y-3">
                   <div>
-                    <p>Product to display</p>
-                    <s-select>
-                      <s-option value="1">All product</s-option>
-                      <s-option value="2">Specific collection</s-option>
-                      <s-option commandFor="modal" command="--show" value="3">Specific product</s-option>
-                      <s-option value="4">Product tag</s-option>
-                      <s-option value="5">Condition</s-option>
-                    </s-select>
+                    <p className="mb-2">Product to display</p>
+                    <button
+                      className="w-full border px-3 py-2 rounded-md flex items-center justify-between"
+                      onClick={() => setOpenDropdown((prev) => !prev)}
+                    >
+                      <span>{selectedOption}</span>
+                      <span className="text-gray-500"><s-icon type='select' /></span>
+                    </button>
+
+                    {openDropdown && (
+                      <div className="mt-1 border rounded-md shadow bg-white flex flex-col">
+                        <button
+                          className="px-3 py-2 text-left hover:bg-gray-100"
+                          onClick={() => {
+                            setSelectedOption("All product");
+                            setOpenDropdown(false);
+                          }}
+                        >
+                          All product
+                        </button>
+                        <button
+                          className="px-3 py-2 text-left hover:bg-gray-100"
+                          commandFor="specific-collection-modal"
+                          command="--show"
+                          onClick={() => {
+                            setSelectedOption("Specific collection");
+
+                            setTimeout(() => {
+                              setOpenDropdown(false);
+                            }, 0);
+                          }}
+                        >
+                          Specific collection
+                        </button>
+                        <button
+                          className="px-3 py-2 text-left hover:bg-gray-100"
+                          commandFor="product-collection-modal"
+                          command="--show"
+                          onClick={() => {
+                            setSelectedOption("Specific product");
+
+                            setTimeout(() => {
+                              setOpenDropdown(false);
+                            }, 0);
+                          }}
+                        >
+                          Specific product
+                        </button>
+                        <button
+                          className="px-3 py-2 text-left hover:bg-gray-100"
+                          onClick={() => {
+                            setSelectedOption("Product tag");
+                            setOpenDropdown(false);
+                          }}
+                        >
+                          Product tag
+                        </button>
+                        <button
+                          className="px-3 py-2 text-left hover:bg-gray-100"
+                          onClick={() => {
+                            setSelectedOption("Condition");
+                            setOpenDropdown(false);
+                          }}
+                        >
+                          Condition
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* <s-modal id="modal" heading="Add badges" padding="none">
+                  <s-modal id="specific-collection-modal" heading="Add collection" padding="none">
                     <div className="p-3 border-b">
                       <s-search-field
                         label="Search"
                         labelAccessibilityVisibility="exclusive"
-                        placeholder="Search badge"
+                        placeholder="Search collections"
+                      />
+                    </div>
+
+                    <div className="mt-3 space-y-3">
+                      {specificCollection.map((badge) => (
+                        <div
+                          key={badge.id}
+                          className="flex items-center gap-3 border-b pb-3 px-4 cursor-pointer"
+                          onClick={() => toggleModalBadge(badge.url)}
+                        >
+                          <s-checkbox checked={modalSelected.includes(badge.url)} />
+
+                          <s-thumbnail
+                            alt={badge.title}
+                            src={badge.url}
+                            size="small"
+                          />
+
+                          <div className='flex flex-col'>
+                            <span className="text-sm font-medium">{badge.title}</span>
+                            <p className="text-xs text-gray-500">{badge.subtitle}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <s-button slot="secondary-actions" commandFor="specific-collection-modal" command="--hide">
+                      Cancel
+                    </s-button>
+                    <s-button
+                      slot="primary-action"
+                      variant="primary"
+                      onClick={() => {
+                        setSelectedImages(modalSelected);
+                      }}
+                      commandFor="specific-collection-modal"
+                      command="--hide"
+                    >
+                      Add
+                    </s-button>
+                  </s-modal>
+
+                  <s-modal id="product-collection-modal" heading="Add product" padding="none">
+                    <div className="p-3 border-b">
+                      <s-search-field
+                        label="Search"
+                        labelAccessibilityVisibility="exclusive"
+                        placeholder="Search product"
                       />
                     </div>
 
@@ -1526,8 +1693,8 @@ export default function LabelEditor() {
                       ))}
                     </div>
 
-                    <s-button slot="secondary-actions" commandFor="modal" command="--hide">
-                      Close
+                    <s-button slot="secondary-actions" commandFor="product-collection-modal" command="--hide">
+                      Cancel
                     </s-button>
                     <s-button
                       slot="primary-action"
@@ -1535,12 +1702,12 @@ export default function LabelEditor() {
                       onClick={() => {
                         setSelectedImages(modalSelected);
                       }}
-                      commandFor="modal"
+                      commandFor="product-collection-modal"
                       command="--hide"
                     >
                       Add
                     </s-button>
-                  </s-modal> */}
+                  </s-modal>
 
                   <div className='mb-3'><s-divider /></div>
 
