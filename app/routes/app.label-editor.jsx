@@ -241,6 +241,35 @@ export default function LabelEditor() {
     };
   }, []);
 
+  const [isMobileScreen, setIsMobileScreen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileScreen(window.innerWidth < 768)
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (isMobileScreen) {
+      setActive("mobile");
+    }
+  }, [isMobileScreen]);
+
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobileScreen(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+
   const handleEmojiClick = (emojiData) => {
     setLabelText((prev) => {
       if (!prev) {
@@ -500,7 +529,1295 @@ export default function LabelEditor() {
 
       <div className="flex flex-wrap bg-white border rounded-xl gap-5 p-3 md:p-5">
         {/* LEFT PANEL */}
-        <div>
+        {isMobileScreen && (
+          <div
+            className={`
+                fixed bottom-10 left-0 right-0 z-50
+                bg-white border-t rounded-t-2xl
+                transition-transform duration-300 ease-in-out
+                ${isEditorOpen ? "translate-y-0" : "translate-y-full"}
+              `}
+            style={{ height: "80vh", overflowY: "auto", scrollbarWidth: 'thin' }}
+          >
+            <div className="w-full md:w-[370px] overflow-y-auto border rounded-xl">
+              <div className="flex justify-center py-2 cursor-pointer" onClick={() => setIsEditorOpen(prev => !prev)}>
+                <div className="w-10 h-1.5 bg-gray-300 rounded-full" />
+              </div>
+              <p className='p-3 font-bold'>
+                {type === 'badgeGroup'
+                  ? 'Badge group editor'
+                  : type === 'labelGroup'
+                    ? 'Label group editor'
+                    : type === 'badges'
+                      ? 'Badge editor'
+                      : type === 'labels'
+                        ? 'Label editor'
+                        : null}
+              </p>
+              <div className="overflow-hidden border-b">
+                <div
+                  className="bg-[#F3F3F3] flex justify-between p-4 cursor-pointer"
+                  onClick={() => setDesignOpen(!designOpen)}
+                >
+                  <div className="flex gap-1 items-center">
+                    <s-icon type="paint-brush-flat" />
+                    <b>
+                      {type === 'labels'
+                        ? 'Label design setting'
+                        : type === 'badges'
+                          ? 'Badge design setting'
+                          : type === 'labelGroup'
+                            ? 'Label group design setting'
+                            : type === 'badgeGroup'
+                              ? 'Badge group design setting'
+                              : ''}
+                    </b>
+                  </div>
+                  <div className={`transition-transform duration-300 ${designOpen ? "rotate-180" : ""}`}>
+                    <s-icon type="chevron-down" />
+                  </div>
+                </div>
+                <div
+                  className={`transition-all duration-300 ease-in-out overflow-hidden ${designOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
+                    }`}
+                >
+                  <div className='p-3'>
+                    <p className='mb-3 font-bold'>{
+                      type === 'labelGroup'
+                        ? 'Add created label'
+                        : type === 'badgeGroup'
+                          ? 'Add created badge'
+                          : 'Shapes Design'
+                    }
+                    </p>
+                    {(type === 'badgeGroup' || type === 'labelGroup') ?
+                      <div className="grid grid-cols-5 gap-3 p-4 max-h-[150px] overflow-y-auto border rounded-lg" style={{ scrollbarWidth: 'thin' }}>
+                        {type === 'labelGroup' && Object.keys(shapeImages)?.slice(0, 4).map((s) => (
+                          <div
+                            key={s}
+                            onClick={() => setShape(s)}
+                            className={`min-w-[56px] h-[56px] border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-105 ${shape === s ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-300'
+                              }`}
+                          >
+                            <div
+                              style={{
+                                width: '36px',
+                                height: '36px',
+                                // background: `linear-gradient(90deg, ${color1}, ${color2})`,
+                                background:
+                                  fillType === "solid"
+                                    ? color1
+                                    : fillType === "gradient"
+                                      ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                      : "transparent",
+
+                                WebkitMaskImage: `url(${shapeImages[s]})`,
+                                WebkitMaskSize: 'contain',
+                                WebkitMaskRepeat: 'no-repeat',
+                                WebkitMaskPosition: 'center',
+                                maskImage: `url(${shapeImages[s]})`,
+                                maskSize: 'contain',
+                                maskRepeat: 'no-repeat',
+                                maskPosition: 'center',
+                              }}
+                            />
+                          </div>
+                        ))}
+                        {type === 'badgeGroup' && findTrustImage?.slice(0, 4).map((img) => (
+                          <div
+                            key={img.id}
+                            onClick={() => handleImageSelect(img.url)}
+                            className={`min-w-[56px] h-[56px] rounded-lg flex items-center justify-center cursor-pointer
+                            ${selectedImages.includes(img.url)
+                                ? 'border-blue-600 bg-blue-50'
+                                : 'border border-gray-200'
+                              }
+                          `}
+                          >
+                            <img src={img.url} className="w-10 h-10 object-contain" />
+                          </div>
+                        ))}
+                        <div className="min-w-[56px] h-[56px]">
+                          <button
+                            commandFor="add-badge-modal"
+                            command="--show"
+                            onClick={() => setModalSelected(selectedImages)}
+                            className="w-[56px] h-[56px] flex items-center justify-center border border-dashed rounded-lg"
+                          >
+                            <s-icon type="plus" size="large" />
+                          </button>
+                        </div>
+                        <s-modal id="add-badge-modal" heading="Select badge" padding="none">
+                          <div className="p-3 border-b">
+                            <s-search-field
+                              label="Search"
+                              labelAccessibilityVisibility="exclusive"
+                              placeholder="Search badge"
+                            />
+                          </div>
+
+                          <div className="mt-3 space-y-3">
+                            {addModalBadges.map((badge) => (
+                              <div
+                                key={badge.id}
+                                className="flex items-center gap-3 border-b pb-3 px-4 cursor-pointer"
+                                onClick={() => toggleModalBadge(badge.url)}
+                              >
+                                <s-checkbox checked={modalSelected.includes(badge.url)} />
+
+                                <s-thumbnail
+                                  alt={badge.title}
+                                  src={badge.url}
+                                  size="small"
+                                />
+
+                                <span className="text-sm font-medium">{badge.title}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          <s-button slot="secondary-actions" commandFor="add-badge-modal" command="--hide">
+                            Cancel
+                          </s-button>
+                          <s-button
+                            slot="primary-action"
+                            variant="primary"
+                            onClick={() => {
+                              setSelectedImages(modalSelected);
+                            }}
+                            commandFor="add-badge-modal"
+                            command="--hide"
+                          >
+                            Add
+                          </s-button>
+                        </s-modal>
+                      </div>
+                      : <div className='border rounded-lg mb-3'>
+                        <div className="flex gap-1 border-b p-2">
+                          <button
+                            onClick={() => setLabelType('shape')}
+                            className={`${labelType === 'shape' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
+                          >
+                            {type === 'labels'
+                              ? 'Shape label'
+                              : type === 'badges'
+                                ? 'Shape badge'
+                                : type === 'labelGroup'
+                                  ? 'Shape label'
+                                  : type === 'badgeGroup'
+                                    ? 'Shape badge'
+                                    : ''}
+                          </button>
+                          <button
+                            onClick={() => setLabelType('image')}
+                            className={`${labelType === 'image' ? 'bg-gray-200' : 'text-gray-500'} px-3 py-1 rounded-md text-[10px] md:text-[12px] font-medium transition-all`}
+                          >
+                            {type === 'labels'
+                              ? 'Readymade image label'
+                              : type === 'badges'
+                                ? 'Readymade image badge'
+                                : type === 'labelGroup'
+                                  ? 'Readymade image label'
+                                  : type === 'badgeGroup'
+                                    ? 'Readymade image badge'
+                                    : ''}
+                          </button>
+                        </div>
+
+                        {labelType === 'shape' ? (
+                          <>
+                            <div className="grid grid-cols-5 gap-3 p-2 max-h-[150px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                              {Object.keys(shapeImages).map((s) => (
+                                <div
+                                  key={s}
+                                  onClick={() => setShape(s)}
+                                  className={`min-w-[56px] h-[56px] border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-105 ${shape === s ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-300'
+                                    }`}
+                                >
+                                  <div
+                                    style={{
+                                      width: '36px',
+                                      height: '36px',
+                                      // background: `linear-gradient(90deg, ${color1}, ${color2})`,
+                                      background:
+                                        fillType === "solid"
+                                          ? color1
+                                          : fillType === "gradient"
+                                            ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                            : "transparent",
+
+                                      WebkitMaskImage: `url(${shapeImages[s]})`,
+                                      WebkitMaskSize: 'contain',
+                                      WebkitMaskRepeat: 'no-repeat',
+                                      WebkitMaskPosition: 'center',
+                                      maskImage: `url(${shapeImages[s]})`,
+                                      maskSize: 'contain',
+                                      maskRepeat: 'no-repeat',
+                                      maskPosition: 'center',
+                                    }}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="grid grid-cols-5 gap-3 p-2 max-h-[150px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                            <div className='min-w-[56px] h-[56px]'>
+                              <s-drop-zone
+                                accessibilityLabel="Upload image"
+                                accept=".jpg,.png,.gif"
+                                onChange={handleDrop}
+                                onDrop={handleDrop}
+                              />
+                            </div>
+
+                            {findTrustImage.map((img) => (
+                              <div
+                                key={img.id}
+                                onClick={() => setSelectedImageUrl(img.url)}
+                                className={`min-w-[56px] h-[56px] border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden transition-transform duration-300 hover:scale-105 ${selectedImageUrl === img.url ? 'border-blue-600 bg-blue-50' : 'border-gray-100'
+                                  }`}
+                              >
+                                <img src={img.url} alt={img.id} className="w-10 h-10 object-contain" />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>}
+
+                    {labelType === 'shape' &&
+                      <div>
+                        <div className='my-3'><s-divider /></div>
+                        <div className='mb-3'>
+                          <p className='mb-1 font-bold'>
+                            {type === 'labels'
+                              ? 'Label text'
+                              : type === 'badges'
+                                ? 'Badge text'
+                                : type === 'badgeGroup'
+                                  ? 'Badge text'
+                                  : type === 'labelGroup'
+                                    ? 'Label text'
+                                    : ''}
+                          </p>
+                          <div className='border rounded-lg'>
+                            <div className='flex gap-[6px] border-b p-2 bg-[#FAFAFA] items-center'>
+                              <button className={`p-[2px] ${bold ? 'bg-gray-200 rounded-md' : ""}`} onClick={() => setBold((prev) => !prev)}><s-icon type='text-bold' /></button>
+                              <button className={`p-[2px] ${italic ? 'bg-gray-200 rounded-md' : ""}`} onClick={() => setItalic((prev) => !prev)}><s-icon type='text-italic' /></button>
+                              <button className={`p-[2px] ${underline ? 'bg-gray-200 rounded-md' : ""}`} onClick={() => setUnderline((prev) => !prev)}><s-icon type='text-underline' /></button>
+                              <div ref={alignMenuRef} className="relative inline-block">
+                                <button
+                                  onClick={() => setOpenAlignMenu((prev) => !prev)}
+                                  className="cursor-pointer text-[12px] flex items-center"
+                                >
+                                  <s-icon type="text-align-left" /> <s-icon type="caret-down" />
+                                </button>
+
+                                {openAlignMenu && (
+                                  <div
+                                    style={{ scrollbarWidth: "thin" }}
+                                    className="absolute top-[110%] left-[-30px] w-[100px] h-[120px] overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-[0_4px_14px_rgba(0,0,0,0.12)] z-[1000]"
+                                  >
+                                    {[
+                                      { align: "left", label: "Left", icon: "text-align-left" },
+                                      { align: "center", label: "Center", icon: "text-align-center" },
+                                      { align: "right", label: "Right", icon: "text-align-right" },
+                                    ].map((item, index) => (
+                                      <div
+                                        key={index}
+                                        onClick={() => {
+                                          setAlignment(item.align);
+                                          setOpenAlignMenu(false);
+                                        }}
+                                        style={{ padding: "5px 10px", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px" }}
+                                        onMouseEnter={(e) => (e.currentTarget.style.background = "#f3f3f3")}
+                                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                                      >
+                                        <s-icon type={item.icon} />
+                                        <span style={{ fontSize: "12px" }}>{item.label}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              <div ref={fontMenuRef} className="relative inline-block">
+                                <button
+                                  onClick={() => setOpenFontsMenu((prev) => !prev)}
+                                  className="cursor-pointer text-[12px] flex items-center"
+                                >
+                                  Poppins <s-icon type='caret-down' />
+                                </button>
+
+                                {openFontsMenu && (
+                                  <div
+                                    style={{ scrollbarWidth: 'thin' }}
+                                    className="absolute top-[110%] left-[-30px] w-[150px] h-[250px] overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-[0_4px_14px_rgba(0,0,0,0.12)] z-[1000]"
+                                  >
+                                    {[
+                                      { fontFamily: "Inter" },
+                                      { fontFamily: "Roboto" },
+                                      { fontFamily: "Helvetica Neue" },
+                                      { fontFamily: "Arial" },
+                                      { fontFamily: "Montserrat" },
+                                      { fontFamily: "Lato" },
+                                      { fontFamily: "Open Sans" },
+                                      { fontFamily: "Poppins" },
+                                      { fontFamily: "Source Sans Pro" },
+                                      { fontFamily: "Nunito" },
+                                      { fontFamily: "Ubuntu" },
+                                      { fontFamily: "Raleway" },
+                                      { fontFamily: "Merriweather" },
+                                      { fontFamily: "Playfair Display" },
+                                      { fontFamily: "Roboto Slab" },
+                                      { fontFamily: "Oswald" },
+                                      { fontFamily: "Titillium Web" },
+                                      { fontFamily: "Fira Sans" },
+                                      { fontFamily: "Quicksand" },
+                                      { fontFamily: "Cabin" },
+                                    ].map((item, index) => (
+                                      <div
+                                        key={index}
+                                        onClick={() => {
+                                          setFontFamily(item.fontFamily);
+                                          setOpenFontsMenu(false);
+                                        }}
+                                        style={{ padding: "5px 10px", cursor: "pointer", fontFamily: item.fontFamily }}
+                                        onMouseEnter={(e) => (e.currentTarget.style.background = "#f3f3f3")}
+                                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                                      >
+                                        {item.fontFamily}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+
+                              </div>
+                              <div ref={emojiMenuRef} className="relative inline-block">
+                                <button
+                                  onClick={() => setShowPicker((prev) => !prev)}
+                                >
+                                  <s-icon type="smiley-happy" />
+                                </button>
+
+                                {showPicker && (
+                                  <div
+                                    className="absolute top-[110%] left-[-220px] z-[1000]"
+                                  >
+                                    <EmojiPicker onEmojiClick={handleEmojiClick} />
+                                  </div>
+                                )}
+                              </div>
+                              <div ref={variableMenuRef} className="relative inline-block">
+                                <button
+                                  onClick={() => setOpenVariableMenu((prev) => !prev)}
+                                  className="px-2 py-[2px] rounded-md border border-gray-300 bg-white cursor-pointer text-[12px]"
+                                >
+                                  Add variable
+                                </button>
+
+                                {openVariableMenu && (
+                                  <div style={{ scrollbarWidth: 'thin' }}
+                                    className="absolute top-[110%] left-[-30px] w-[150px] h-[250px] overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-[0_4px_14px_rgba(0,0,0,0.12)] z-[1000]"
+                                  >
+                                    {[
+                                      { title: "Product vendor", example: "ABC vendor" },
+                                      { title: "Percentage discount", example: "10% off" },
+                                      { title: "Amount discount", example: "$10 off" },
+                                      { title: "Price", example: "Only $10" },
+                                      { title: "Rating", example: "5 star" },
+                                      { title: "Number of review", example: "500 reviews" },
+                                      { title: "Remaining stock", example: "only 5 left" },
+                                      { title: "Product metafield", example: "100% pure" },
+                                    ].map((item, index) => (
+                                      <div
+                                        key={index}
+                                        onClick={() => {
+                                          setLabelText(item.example);
+                                          setOpenVariableMenu(false);
+                                        }}
+                                        style={{
+                                          padding: "5px 10px",
+                                          cursor: "pointer",
+                                        }}
+                                        onMouseEnter={(e) =>
+                                          (e.currentTarget.style.background = "#f3f3f3")
+                                        }
+                                        onMouseLeave={(e) =>
+                                          (e.currentTarget.style.background = "transparent")
+                                        }
+                                      >
+                                        <div style={{ fontWeight: 500, fontSize: "12px" }}>
+                                          {item.title}
+                                        </div>
+                                        <div style={{ fontSize: "11px", color: "#6d6d6d" }}>
+                                          Example: {item.example}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div>
+                              <textarea
+                                ref={textareaRef}
+                                value={labelText}
+                                onChange={(e) => setLabelText(e.target.value)}
+                                rows="3"
+                                cols="40"
+                                className="outline-none p-2"
+                              ></textarea>
+                            </div>
+                          </div>
+                          <div className='mt-3'>
+                            <s-clickable-chip>Note: If {labelText} not exists on selected product</s-clickable-chip>
+                          </div>
+                        </div>
+
+                        <div className='mb-3'><s-divider /></div>
+                        <p className='font-bold mb-3'>Color fill</p>
+
+                        <div className="flex mb-4">
+                          <div className="inline-flex border border-gray-300 rounded-lg bg-white overflow-hidden">
+                            <button
+                              onClick={() => setFillType("solid")}
+                              className={`px-3 py-1 text-[12px] font-medium transition
+                            ${fillType === "solid"
+                                  ? "bg-[#EBEBEB] text-black"
+                                  : "bg-white text-gray-700"
+                                }`}
+                            >
+                              Solid fill
+                            </button>
+
+                            <button
+                              onClick={() => setFillType("gradient")}
+                              className={`px-3 py-1 text-[12px] font-medium transition
+                            ${fillType === "gradient"
+                                  ? "bg-[#EBEBEB] text-black"
+                                  : "bg-white text-gray-700"
+                                }`}
+                            >
+                              Gradient fill
+                            </button>
+                          </div>
+                        </div>
+
+                        {fillType === "solid" && (
+                          <>
+                            <div className="flex items-center gap-3 mb-3">
+                              <input
+                                type="color"
+                                value={color1}
+                                onChange={(e) => setColor1(e.target.value)}
+                                className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                              />
+                              <div>
+                                <p className="text-[13px] font-medium">Background color</p>
+                                <p className="text-[12px] uppercase text-gray-500">{color1}</p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 mb-4">
+                              <input
+                                type="color"
+                                value={textColor}
+                                onChange={(e) => setTextColor(e.target.value)}
+                                className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                              />
+                              <div>
+                                <p className="text-[13px] font-medium">Text color</p>
+                                <p className="text-[12px] uppercase text-gray-500">{textColor}</p>
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        {fillType === "gradient" && (
+                          <>
+                            <div className="flex items-center gap-3 mb-3">
+                              <input
+                                type="color"
+                                value={color1}
+                                onChange={(e) => setColor1(e.target.value)}
+                                className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                              />
+                              <div>
+                                <p className="text-[13px] font-medium">Start background</p>
+                                <p className="text-[12px] uppercase text-gray-500">{color1}</p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 mb-3">
+                              <input
+                                type="color"
+                                value={color2}
+                                onChange={(e) => setColor2(e.target.value)}
+                                className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                              />
+                              <div>
+                                <p className="text-[13px] font-medium">End background</p>
+                                <p className="text-[12px] uppercase text-gray-500">{color2}</p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 mb-4">
+                              <input
+                                type="color"
+                                value={textColor}
+                                onChange={(e) => setTextColor(e.target.value)}
+                                className="w-12 h-12 bg-white color-picker-custom cursor-pointer"
+                              />
+                              <div>
+                                <p className="text-[13px] font-medium">Text color</p>
+                                <p className="text-[12px] uppercase text-gray-500">{textColor}</p>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    }
+
+                    {(type !== 'badgeGroup' && type !== 'labelGroup') &&
+                      <>
+                        <div className='mb-3'><s-divider /></div>
+                        <p className='font-bold mb-2'>Interaction setting</p>
+                        <div className='mb-2'>
+                          <s-checkbox
+                            label="Add action link"
+                            checked={isActionLinkEnabled}
+                            onChange={(e) => setIsActionLinkEnabled(e.target.checked)}
+                          />
+                          {isActionLinkEnabled && (
+                            <s-email-field
+                              placeholder="https://www.yourstore.com"
+                              value={actionLinkUrl}
+                              onChange={(e) => setActionLinkUrl(e.target.value)}
+                            />
+                          )}
+                        </div>
+                        <div className='mb-3'>
+                          <s-checkbox
+                            label="Show tooltip for label"
+                            checked={isTooltipEnabled}
+                            onChange={(e) => setIsTooltipEnabled(e.target.checked)}
+                          />
+                          {isTooltipEnabled && (
+                            <s-text-field
+                              placeholder="Add tooltip message here"
+                              value={labelTooltip}
+                              onChange={(e) => setLabelTooltip(e.target.value)}
+                            />
+                          )}
+                        </div>
+                      </>
+                    }
+                    <div className='my-3'><s-divider /></div>
+                    <div className='mb-3'>
+                      <p className="font-semibold mb-2">
+                        {type === 'labels' ? 'Label position' : type === 'badges' ? 'Badge position' : type === 'badgeGroup' ? 'Badge position' : type === 'labelGroup' ? 'Label position' : ''}
+                      </p>
+                      {type === 'badges' && <div>
+                        <div className='mb-3'>
+                          <p className='mb-1'>
+                            {type === 'labels' ? 'Label to display' : type === 'badges' ? 'Badge to display' : type === 'badgeGroup' ? 'Badge to display' : type === 'labelGroup' ? 'Label to display' : ''}
+                          </p>
+                          <s-select
+                            value={selectedDropdown}
+                            onChange={(val) => {
+                              setSelectedDropdown(val);
+                              const pos = labelPositionsDropdown.find(p => p.id === val);
+                              if (pos) setSelected(pos.className);
+                            }}
+                          >
+                            {labelPositionsDropdown.map((pos) => (
+                              <s-option key={pos.id} value={pos.id}>
+                                {pos.label}
+                              </s-option>
+                            ))}
+                          </s-select>
+                        </div>
+                        <div className="bg-gray-100 rounded-xl p-1 flex">
+                          <button
+                            onClick={() => setProductAlign("left")}
+                            className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "left" ? "bg-white shadow-sm" : ""
+                              }`}
+                          >
+                            <s-icon type="arrow-left" />
+                          </button>
+
+                          <button
+                            onClick={() => setProductAlign("center")}
+                            className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "center" ? "bg-white shadow-sm" : ""
+                              }`}
+                          >
+                            <img src={Blank} className="w-5 h-5" />
+                          </button>
+
+                          <button
+                            onClick={() => setProductAlign("right")}
+                            className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "right" ? "bg-white shadow-sm" : ""
+                              }`}
+                          >
+                            <s-icon type="arrow-right" />
+                          </button>
+                        </div>
+                      </div>}
+                      {(type === "labels") && <div className="relative bg-[#F0ECE8] p-4 rounded-xl w-[260px]">
+                        <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
+                          <img
+                            src={productFrame}
+                            alt="product"
+                            className="h-32 opacity-80"
+                          />
+                        </div>
+
+                        <div className="relative z-10 grid grid-cols-3 gap-3">
+                          {positions.map((pos) => (
+                            <button
+                              key={pos}
+                              onClick={() => setSelected(pos)}
+                              className={`relative h-16 rounded-lg border transition-all
+                          ${selected === pos
+                                  ? "bg-white"
+                                  : "border-transparent bg-white/70 hover:border-gray-300"
+                                }
+                         `}
+                            >
+                              {selected === pos && (
+                                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center">
+                                  <img src={statusActivation} alt="status" />
+                                </div>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>}
+                      {(type === "labelGroup" || type === "badgeGroup") && <div>
+                        <div className='mb-3'>
+                          <p className='mb-1'>
+                            {type === 'labels' ? 'Label to display' : type === 'badges' ? 'Badge to display' : type === 'badgeGroup' ? 'Badge to display' : type === 'labelGroup' ? 'Label to display' : ''}
+                          </p>
+                          <s-select
+                            value={selectedDropdown}
+                            onChange={(val) => {
+                              setSelectedDropdown(val);
+                              const pos = labelPositionsDropdown.find(p => p.id === val);
+                              if (pos) setSelected(pos.className);
+                            }}
+                          >
+                            {labelPositionsDropdown.map((pos) => (
+                              <s-option key={pos.id} value={pos.id}>
+                                {pos.label}
+                              </s-option>
+                            ))}
+                          </s-select>
+                        </div>
+                        <div className='mb-3'>
+                          <p className='mb-1'>
+                            Display type
+                          </p>
+                          <s-select
+                            value={selectedDisplayType}
+                            onChange={(val) => {
+
+                              setSelectedDisplayType(val);
+                              const pos = displayTypeOptions.find(p => p.id === val);
+                              if (pos) setSelected(pos.className);
+                            }}
+                          >
+                            {displayTypeOptions.map((pos) => (
+                              <s-option key={pos.id} value={pos.id}>
+                                {pos.label}
+                              </s-option>
+                            ))}
+                          </s-select>
+                        </div>
+                        <div className="bg-gray-100 rounded-xl p-1 flex">
+                          <button
+                            onClick={() => setProductAlign("left")}
+                            className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "left" ? "bg-white shadow-sm" : ""
+                              }`}
+                          >
+                            <s-icon type="arrow-left" />
+                          </button>
+
+                          <button
+                            onClick={() => setProductAlign("center")}
+                            className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "center" ? "bg-white shadow-sm" : ""
+                              }`}
+                          >
+                            <img src={Blank} className="w-5 h-5" />
+                          </button>
+
+                          <button
+                            onClick={() => setProductAlign("right")}
+                            className={`flex-1 h-8 rounded-lg flex items-center justify-center ${productAlign === "right" ? "bg-white shadow-sm" : ""
+                              }`}
+                          >
+                            <s-icon type="arrow-right" />
+                          </button>
+                        </div>
+
+                      </div>}
+                    </div>
+                    {labelType === 'shape' &&
+                      <>
+                        <div className='mb-3'><s-divider /></div>
+                        <div className='mb-3'>
+                          <p className="font-semibold mb-4">Style setting</p>
+
+                          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                            <div>
+                              <p className="mb-1">
+                                {type === 'labels'
+                                  ? 'Label width'
+                                  : type === 'badges'
+                                    ? 'Badge width'
+                                    : type === 'badgeGroup'
+                                      ? 'Badge width'
+                                      : type === 'labelGroup'
+                                        ? 'Label width'
+                                        : ''}
+                              </p>
+                              <s-number-field
+                                value={badgeWidth}
+                                suffix="Px"
+                                onChange={(e) => setBadgeWidth(Number(e.target.value))}
+                              />
+
+                            </div>
+
+                            <div>
+                              <p className="mb-1">
+                                {type === 'labels'
+                                  ? 'Label height'
+                                  : type === 'badges'
+                                    ? 'Badge height'
+                                    : type === 'badgeGroup'
+                                      ? 'Badge height'
+                                      : type === 'labelGroup'
+                                        ? 'Label height'
+                                        : ''}
+                              </p>
+                              <s-number-field
+                                value={badgeHeight}
+                                suffix="Px"
+                                onChange={(e) => setBadgeHeight(Number(e.target.value))}
+                              />
+
+                            </div>
+
+                            <div>
+                              <p className="mb-1">Rounded corner</p>
+                              <s-number-field
+                                value={badgeRadius}
+                                suffix="Px"
+                                onChange={(e) => setBadgeRadius(Number(e.target.value))}
+                              />
+
+                            </div>
+
+                            <div>
+                              <p className="mb-1">
+                                {type === 'labels'
+                                  ? 'Label opacity'
+                                  : type === 'badges'
+                                    ? 'Badge opacity'
+                                    : type === 'badgeGroup'
+                                      ? 'Badge opacity'
+                                      : type === 'labelGroup'
+                                        ? 'Label opacity'
+                                        : ''}
+                              </p>
+                              <s-number-field
+                                value={badgeOpacity}
+                                suffix="%"
+                                onChange={(e) => setBadgeOpacity(Number(e.target.value))}
+                              />
+
+                            </div>
+
+                            <div>
+                              <p className="mb-1">Margin</p>
+                              <s-number-field
+                                value={badgeMargin}
+                                suffix="Px"
+                                onChange={(e) => setBadgeMargin(Number(e.target.value))}
+                              />
+
+                            </div>
+
+                            <div>
+                              <p className="mb-1">Padding</p>
+                              <s-number-field
+                                value={badgePadding}
+                                suffix="Px"
+                                onChange={(e) => setBadgePadding(Number(e.target.value))}
+                              />
+
+                            </div>
+                          </div>
+                        </div>
+                        <div className='mb-3'><s-divider /></div>
+                        <div className='mb-3'>
+                          <p className="font-semibold mb-2">Custom</p>
+                          <s-checkbox
+                            label="Custom CSS"
+                            checked={enableCustomCss}
+                            onChange={(e) => setEnableCustomCss(e.target.checked)}
+                          />
+                          {enableCustomCss && <s-text-area
+                            value={customCss}
+                            placeholder="Enter your custom css here"
+                            rows={4}
+                            onInput={(e) => setCustomCss(e.target.value)}
+                          />}
+                          {enableCustomCss && (
+                            <p className="text-[11px] text-gray-500 mt-1">
+                              Example: font-size:14px; text-transform:uppercase;
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    }
+                    {(type === 'badgeGroup' || type === 'labelGroup') &&
+                      <>
+                        <div className='mb-3'><s-divider /></div>
+                        <div className='mb-3'>
+                          <p className="font-semibold mb-4">Style setting</p>
+
+                          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                            <div>
+                              <p className="mb-1">
+                                {type === 'badgeGroup'
+                                  ? 'Gap between the badge'
+                                  : type === 'labelGroup'
+                                    ? 'Gap between the label'
+                                    : ''}
+                              </p>
+                              <s-number-field
+                                value={badgeWidth}
+                                suffix="Px"
+                                onChange={(e) => setBadgeWidth(Number(e.target.value))}
+                              />
+
+                            </div>
+
+                            <div>
+                              <p className="mb-1">
+                                {type === 'badgeGroup'
+                                  ? 'Badge height'
+                                  : type === 'labelGroup'
+                                    ? 'Label height'
+                                    : ''}
+                              </p>
+                              <s-number-field
+                                value={badgeHeight}
+                                suffix="Px"
+                                onChange={(e) => setBadgeHeight(Number(e.target.value))}
+                              />
+
+                            </div>
+
+                            <div>
+                              <p className="mb-1">Margin</p>
+                              <s-number-field
+                                value={badgeMargin}
+                                suffix="Px"
+                                onChange={(e) => setBadgeMargin(Number(e.target.value))}
+                              />
+
+                            </div>
+                          </div>
+                        </div>
+                        <div className='mb-3'><s-divider /></div>
+                        <div className='mb-3'>
+                          <p className="font-semibold mb-2">Custom</p>
+                          <s-checkbox
+                            label="Custom CSS"
+                            checked={enableCustomCss}
+                            onChange={(e) => setEnableCustomCss(e.target.checked)}
+                          />
+                          {enableCustomCss && <s-text-area
+                            value={customCss}
+                            placeholder="Enter your custom css here"
+                            rows={4}
+                            onInput={(e) => setCustomCss(e.target.value)}
+                          />}
+                          {enableCustomCss && (
+                            <p className="text-[11px] text-gray-500 mt-1">
+                              Example: font-size:14px; text-transform:uppercase;
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    }
+                    {(type !== 'badgeGroup' && type !== 'labelGroup') &&
+                      <>
+                        <div className='mb-3'><s-divider /></div>
+                        <div className='mb-3'>
+                          <p className="font-semibold mb-2">Visibility date</p>
+                          <div className="flex gap-6 items-center mb-3">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="visibility"
+                                value="always"
+                                checked={visibilityType === "always"}
+                                onChange={(e) => setVisibilityType(e.target.value)}
+                                className="accent-blue-600"
+                              />
+                              <span className="text-sm">Always visible</span>
+                            </label>
+
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="visibility"
+                                value="specific"
+                                checked={visibilityType === "specific"}
+                                onChange={(e) => setVisibilityType(e.target.value)}
+                                className="accent-blue-600"
+                              />
+                              <span className="text-sm">Specific dates</span>
+                            </label>
+                          </div>
+                          {visibilityType === "specific" && (
+                            <>
+                              <div className="mb-3">
+                                <p className="mb-1">Start date</p>
+                                <s-date-field
+                                  defaultView="2025-09"
+                                  defaultValue="2025-09-01"
+                                />
+                              </div>
+
+                              <div className="mb-3">
+                                <p className="mb-1">End date</p>
+                                <s-date-field
+                                  defaultView="2025-09"
+                                  defaultValue="2025-09-01"
+                                />
+                              </div>
+                            </>
+                          )}
+                          <s-checkbox
+                            label="Daily recurring timer"
+                            checked={dailyRecurringTime}
+                            onChange={(e) => setDailyRecurringTime(e.target.checked)}
+                          />
+                          {/* Time */}
+                          {dailyRecurringTime && (
+                            <div className="grid grid-cols-2 gap-4 mt-2">
+                              {/* Start */}
+                              <div>
+                                <p className="mb-1 font-medium">Start time</p>
+                                <div className="flex border border-[#B1B1B1] rounded-lg h-[38px] overflow-hidden">
+                                  <input
+                                    value={startTime}
+                                    onChange={(e) => setStartTime(e.target.value)}
+                                    className="flex-1 px-3 outline-none text-sm"
+                                  />
+
+                                  <div className="w-px bg-[#B1B1B1]" />
+
+                                  <div className="w-[70px] flex items-center justify-between px-2">
+                                    <span className="font-medium text-sm">{startPeriod}</span>
+                                    <div className="flex flex-col">
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
+                                        }
+                                        className="h-4 opacity-70 hover:opacity-100"
+                                      >
+                                        <s-icon type="chevron-up" className="w-3 h-3" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setStartPeriod(startPeriod === "AM" ? "PM" : "AM")
+                                        }
+                                        className="h-4 opacity-70 hover:opacity-100"
+                                      >
+                                        <s-icon type="chevron-down" className="w-3 h-3" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* End */}
+                              <div>
+                                <p className="mb-1 font-medium">End time</p>
+                                <div className="flex border border-[#B1B1B1] rounded-lg h-[38px] overflow-hidden">
+                                  <input
+                                    value={endTime}
+                                    onChange={(e) => setEndTime(e.target.value)}
+                                    className="flex-1 px-3 outline-none text-sm"
+                                  />
+
+                                  <div className="w-px bg-[#B1B1B1]" />
+
+                                  <div className="w-[70px] flex items-center justify-between px-2">
+                                    <span className="font-medium text-sm">{endPeriod}</span>
+                                    <div className="flex flex-col">
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setEndPeriod(endPeriod === "AM" ? "PM" : "AM")
+                                        }
+                                        className="h-4 opacity-70 hover:opacity-100"
+                                      >
+                                        <s-icon type="chevron-up" className="w-3 h-3" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setEndPeriod(endPeriod === "AM" ? "PM" : "AM")
+                                        }
+                                        className="h-4 opacity-70 hover:opacity-100"
+                                      >
+                                        <s-icon type="chevron-down" className="w-3 h-3" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div className="overflow-hidden">
+                <div
+                  className="bg-[#F3F3F3] flex justify-between p-4 cursor-pointer"
+                  onClick={() => setOpen(!open)}
+                >
+                  <div className="flex gap-1 items-center">
+                    <s-icon type="product" />
+                    <b>Display</b>
+                  </div>
+
+                  <div
+                    className={`transition-transform duration-300 ${open ? "rotate-180" : ""
+                      }`}
+                  >
+                    <s-icon type="chevron-down" />
+                  </div>
+                </div>
+
+                <div
+                  className={`transition-all duration-300 ease-in-out overflow-hidden ${open ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+                    }`}
+                >
+                  <div className="px-4 py-3 space-y-3">
+                    <div>
+                      <p className="mb-2">Product to display</p>
+                      <button
+                        className="w-full border px-3 py-2 rounded-md flex items-center justify-between"
+                        onClick={() => setOpenDropdown((prev) => !prev)}
+                      >
+                        <span>{selectedOption}</span>
+                        <span className="text-gray-500"><s-icon type='select' /></span>
+                      </button>
+
+                      {openDropdown && (
+                        <div className="mt-1 border rounded-md shadow bg-white flex flex-col">
+                          <button
+                            className="px-3 py-2 text-left hover:bg-gray-100"
+                            onClick={() => {
+                              setSelectedOption("All product");
+                              setOpenDropdown(false);
+                            }}
+                          >
+                            All product
+                          </button>
+                          <button
+                            className="px-3 py-2 text-left hover:bg-gray-100"
+                            commandFor="specific-collection-modal"
+                            command="--show"
+                            onClick={() => {
+                              setSelectedOption("Specific collection");
+
+                              setTimeout(() => {
+                                setOpenDropdown(false);
+                              }, 0);
+                            }}
+                          >
+                            Specific collection
+                          </button>
+                          <button
+                            className="px-3 py-2 text-left hover:bg-gray-100"
+                            commandFor="product-collection-modal"
+                            command="--show"
+                            onClick={() => {
+                              setSelectedOption("Specific product");
+
+                              setTimeout(() => {
+                                setOpenDropdown(false);
+                              }, 0);
+                            }}
+                          >
+                            Specific product
+                          </button>
+                          <button
+                            className="px-3 py-2 text-left hover:bg-gray-100"
+                            onClick={() => {
+                              setSelectedOption("Product tag");
+                              setOpenDropdown(false);
+                            }}
+                          >
+                            Product tag
+                          </button>
+                          <button
+                            className="px-3 py-2 text-left hover:bg-gray-100"
+                            onClick={() => {
+                              setSelectedOption("Condition");
+                              setOpenDropdown(false);
+                            }}
+                          >
+                            Condition
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <s-modal id="specific-collection-modal" heading="Add collection" padding="none">
+                      <div className="p-3 border-b">
+                        <s-search-field
+                          label="Search"
+                          labelAccessibilityVisibility="exclusive"
+                          placeholder="Search collections"
+                        />
+                      </div>
+
+                      <div className="mt-3 space-y-3">
+                        {specificCollection.map((badge) => (
+                          <div
+                            key={badge.id}
+                            className="flex items-center gap-3 border-b pb-3 px-4 cursor-pointer"
+                            onClick={() => toggleModalBadge(badge.url)}
+                          >
+                            <s-checkbox checked={modalSelected.includes(badge.url)} />
+
+                            <s-thumbnail
+                              alt={badge.title}
+                              src={badge.url}
+                              size="small"
+                            />
+
+                            <div className='flex flex-col'>
+                              <span className="text-sm font-medium">{badge.title}</span>
+                              <p className="text-xs text-gray-500">{badge.subtitle}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <s-button slot="secondary-actions" commandFor="specific-collection-modal" command="--hide">
+                        Cancel
+                      </s-button>
+                      <s-button
+                        slot="primary-action"
+                        variant="primary"
+                        onClick={() => {
+                          setSelectedImages(modalSelected);
+                        }}
+                        commandFor="specific-collection-modal"
+                        command="--hide"
+                      >
+                        Add
+                      </s-button>
+                    </s-modal>
+
+                    <s-modal id="product-collection-modal" heading="Add product" padding="none">
+                      <div className="p-3 border-b">
+                        <s-search-field
+                          label="Search"
+                          labelAccessibilityVisibility="exclusive"
+                          placeholder="Search product"
+                        />
+                      </div>
+
+                      <div className="mt-3 space-y-3">
+                        {modalBadges.map((badge) => (
+                          <div
+                            key={badge.id}
+                            className="flex items-center gap-3 border-b pb-3 px-4 cursor-pointer"
+                            onClick={() => toggleModalBadge(badge.url)}
+                          >
+                            <s-checkbox checked={modalSelected.includes(badge.url)} />
+
+                            <s-thumbnail
+                              alt={badge.title}
+                              src={badge.url}
+                              size="small"
+                            />
+
+                            <span className="text-sm font-medium">{badge.title}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <s-button slot="secondary-actions" commandFor="product-collection-modal" command="--hide">
+                        Cancel
+                      </s-button>
+                      <s-button
+                        slot="primary-action"
+                        variant="primary"
+                        onClick={() => {
+                          setSelectedImages(modalSelected);
+                        }}
+                        commandFor="product-collection-modal"
+                        command="--hide"
+                      >
+                        Add
+                      </s-button>
+                    </s-modal>
+
+                    <div className='mb-3'><s-divider /></div>
+
+                    <div>
+                      <p className="font-bold mb-2">
+                        {type === 'labels'
+                          ? 'Label display'
+                          : type === 'badges'
+                            ? 'Badge display'
+                            : type === 'badgeGroup'
+                              ? 'Badge display'
+                              : type === 'labelGroup'
+                                ? 'Label display'
+                                : ''}
+                      </p>
+
+                      <p className="mb-1 font-semibold">Device</p>
+                      <div className="flex gap-5 md:gap-16">
+                        <s-checkbox label="Desktop" />
+                        <s-checkbox label="Mobile" />
+                      </div>
+
+                      <p className="mt-3 mb-1 font-semibold">Page</p>
+                      <div className="flex gap-5 md:gap-16">
+                        <s-checkbox label="Home page" />
+                        <s-checkbox label="Product page" />
+                      </div>
+                      <div className="flex gap-5 md:gap-10">
+                        <s-checkbox label="Collection page" />
+                        <s-checkbox label="Cart page" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>)}
+
+        {!isMobileScreen && (<div>
           <div className="w-full md:w-[370px] 
            overflow-y-auto border rounded-xl">
             <p className='p-3 font-bold'>
@@ -552,7 +1869,38 @@ export default function LabelEditor() {
                   </p>
                   {(type === 'badgeGroup' || type === 'labelGroup') ?
                     <div className="grid grid-cols-5 gap-3 p-4 max-h-[150px] overflow-y-auto border rounded-lg" style={{ scrollbarWidth: 'thin' }}>
-                      {findTrustImage?.slice(0, 4).map((img) => (
+                      {type === 'labelGroup' && Object.keys(shapeImages)?.slice(0, 4).map((s) => (
+                        <div
+                          key={s}
+                          onClick={() => setShape(s)}
+                          className={`min-w-[56px] h-[56px] border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-105 ${shape === s ? 'border-blue-600 bg-blue-50' : 'border-gray-100 hover:border-gray-300'
+                            }`}
+                        >
+                          <div
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              // background: `linear-gradient(90deg, ${color1}, ${color2})`,
+                              background:
+                                fillType === "solid"
+                                  ? color1
+                                  : fillType === "gradient"
+                                    ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                    : "transparent",
+
+                              WebkitMaskImage: `url(${shapeImages[s]})`,
+                              WebkitMaskSize: 'contain',
+                              WebkitMaskRepeat: 'no-repeat',
+                              WebkitMaskPosition: 'center',
+                              maskImage: `url(${shapeImages[s]})`,
+                              maskSize: 'contain',
+                              maskRepeat: 'no-repeat',
+                              maskPosition: 'center',
+                            }}
+                          />
+                        </div>
+                      ))}
+                      {type === 'badgeGroup' && findTrustImage?.slice(0, 4).map((img) => (
                         <div
                           key={img.id}
                           onClick={() => handleImageSelect(img.url)}
@@ -1744,7 +3092,7 @@ export default function LabelEditor() {
               </div>
             </div>
           </div>
-        </div>
+        </div>)}
 
         {/* RIGHT PANEL */}
         <div className="flex-1 bg-[#F6F6F7] overflow-y-auto border rounded-xl flex flex-col items-center">
@@ -1756,22 +3104,24 @@ export default function LabelEditor() {
                   Preview
                 </p>
 
-                <div className="flex items-center gap-1 bg-[#ebebeb] p-1 rounded-md md:hidden">
-                  <div
-                    onClick={() => setActive("desktop")}
-                    className={`cursor-pointer p-1 rounded-md transition-all ${active === "desktop" ? "bg-white shadow-sm" : "opacity-60"
-                      }`}
-                  >
-                    <s-icon type="desktop" />
+                {!isMobileScreen && (
+                  <div className="flex items-center gap-1 bg-[#ebebeb] p-1 rounded-md md:hidden">
+                    <div
+                      onClick={() => setActive("desktop")}
+                      className={`cursor-pointer p-1 rounded-md transition-all ${active === "desktop" ? "bg-white shadow-sm" : "opacity-60"
+                        }`}
+                    >
+                      <s-icon type="desktop" />
+                    </div>
+                    <div
+                      onClick={() => setActive("mobile")}
+                      className={`cursor-pointer p-1 rounded-md transition-all ${active === "mobile" ? "bg-white shadow-sm" : "opacity-60"
+                        }`}
+                    >
+                      <s-icon type="mobile" />
+                    </div>
                   </div>
-                  <div
-                    onClick={() => setActive("mobile")}
-                    className={`cursor-pointer p-1 rounded-md transition-all ${active === "mobile" ? "bg-white shadow-sm" : "opacity-60"
-                      }`}
-                  >
-                    <s-icon type="mobile" />
-                  </div>
-                </div>
+                )}
               </div>
 
               <div className="flex items-center gap-2">
@@ -1902,7 +3252,7 @@ export default function LabelEditor() {
 
             </div>
           </div>
-          <div className={`transition-all duration-500 ease-in-out ${active === 'mobile' ? 'w-[320px] md:w-[375px] min-h-[667px] shadow-2xl border-[6px] border-gray-800 rounded-[3rem] mb-10 overflow-hidden bg-white mt-5' : 'w-full'}`}>
+          <div className={`transition-all duration-500 ease-in-out ${active === 'mobile' ? 'w-[320px] md:w-[375px] min-h-[500px] shadow-2xl border-[6px] border-gray-800 rounded-[3rem] mb-10 overflow-hidden bg-white mt-5' : 'w-full'}`}>
             <s-card>
               <div className={`space-y-4 bg-white rounded-2xl shadow-sm border p-3 md:p-5 ${active === 'mobile' ? 'm-0' : 'm-2 md:m-5'}`}>
                 {previewPage === "collection" && (
@@ -1914,6 +3264,97 @@ export default function LabelEditor() {
                         <div key={item} className="flex-shrink-0">
                           <div className={`relative bg-[#E3EDFB] flex items-center justify-center overflow-hidden transition-all`}>
                             {type === 'labels' && <div
+                              className={`absolute z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
+                              style={{
+                                width: `${finalWidth}px`,
+                                height: `${finalHeight}px`,
+                                opacity: badgeOpacity / 100,
+                                margin: `${badgeMargin}px`,
+                                padding: `${finalPadding}px`,
+                                borderRadius: `${badgeRadius}px`,
+                                ...(labelType === 'shape'
+                                  ? {
+                                    // background: `linear-gradient(90deg, ${color1}, ${color2})`,
+                                    background:
+                                      fillType === "solid"
+                                        ? color1
+                                        : fillType === "gradient"
+                                          ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                          : "transparent",
+
+                                    WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                    WebkitMaskSize: '100% 100%',
+                                    WebkitMaskRepeat: 'no-repeat',
+                                    WebkitMaskPosition: 'center',
+                                    maskImage: `url(${shapeImages[shape]})`,
+                                    maskSize: '100% 100%',
+                                    maskRepeat: 'no-repeat',
+                                    maskPosition: 'center',
+                                  }
+                                  : {
+                                    background: 'transparent',
+                                  }),
+                              }}
+                            >
+                              {labelType === 'shape' ? (
+                                <div
+                                  className="w-full h-full flex items-center"
+                                  style={{ color: textColor, textAlign: alignment }}
+                                >
+                                  <span
+                                    title={isTooltipEnabled ? labelTooltip : ""}
+                                    tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                    role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                    onClick={() => {
+                                      if (isActionLinkEnabled && actionLinkUrl) {
+                                        window.open(actionLinkUrl, "_blank");
+                                      }
+                                    }}
+                                    className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                    style={{
+                                      fontFamily: fontFamily,
+                                      lineHeight: '1.2',
+                                      display: '-webkit-box',
+                                      WebkitLineClamp: 2,
+                                      WebkitBoxOrient: 'vertical',
+                                      wordBreak: 'break-word',
+                                      ...parseCustomCss(customCss),
+                                      ...style
+                                    }}
+                                  >
+                                    {labelText}
+                                  </span>
+                                </div>
+                              ) : (
+                                selectedImageUrl && (
+                                  <div
+                                    title={isTooltipEnabled ? labelTooltip : ""}
+                                    tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                    role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                    onClick={() => {
+                                      if (isActionLinkEnabled && actionLinkUrl) {
+                                        window.open(actionLinkUrl, "_blank");
+                                      }
+                                    }}
+                                    className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                      } flex justify-center items-center`}
+                                  >
+                                    <img
+                                      src={selectedImageUrl}
+                                      alt="label"
+                                      className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                        } object-contain`}
+                                    />
+                                  </div>
+                                )
+                              )}
+                            </div>}
+
+                            {type === 'labelGroup' && <div
                               className={`absolute z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
                               style={{
                                 width: `${finalWidth}px`,
