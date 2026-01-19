@@ -396,6 +396,37 @@ export default function LabelEditor() {
     return map[pos] || "top-0 left-0";
   };
 
+  const getPositionAboveClasses = (position) => {
+  switch (position) {
+    case 'above-title':
+      return 'absolute -top-3 left-0';
+
+    case 'below-title':
+      return 'absolute top-full left-0 mt-1';
+
+    case 'above-price':
+      return 'absolute -top-3 right-0';
+
+    case 'below-price':
+      return 'absolute top-full right-0 mt-1';
+
+    case 'before-title':
+      return 'mr-2';
+
+    case 'after-title':
+      return 'ml-2';
+
+    case 'before-price':
+      return 'mr-2';
+
+    case 'after-price':
+      return 'ml-2';
+
+    default:
+      return '';
+  }
+};
+
   const getProductLabelAlign = () => {
     switch (productAlign) {
       case "left":
@@ -478,6 +509,8 @@ export default function LabelEditor() {
   const finalHeight = shapeConfig.forceSquare ? baseSize : badgeHeight;
   const finalPadding = badgePadding * shapeConfig.paddingMultiplier;
 
+  const inlinePositions = ['before-title', 'after-title', 'before-price', 'after-price'];
+
   return (
     <s-page heading="Seliqo Product Labels & Badges" inlineSize="large">
       <div className="flex items-center justify-center md:justify-start gap-2 py-3">
@@ -504,7 +537,7 @@ export default function LabelEditor() {
           <div className="inline-flex border border-gray-300 rounded-lg bg-white overflow-hidden">
             <button
               onClick={() => setActiveStatus("Active")}
-              className={`px-3 py-1 text-[12px] font-medium transition
+              className={`px-1 md:px-3 py-[2px] md:py-1 text-[10px] md:text-[12px] font-medium transition
             ${activeStatus === "Active"
                   ? "bg-[#AFFEBF] text-[#1F6A56]"
                   : "bg-white text-gray-700"
@@ -515,7 +548,7 @@ export default function LabelEditor() {
 
             <button
               onClick={() => setActiveStatus("Inactive")}
-              className={`px-3 py-1 text-[12px] font-medium transition
+              className={`px-1 md:px-3 py-[2px] md:py-1 text-[10px] md:text-[12px] font-medium transition
             ${activeStatus === "Inactive"
                   ? "bg-gray-300 text-gray-800"
                   : "bg-white text-gray-700"
@@ -1122,20 +1155,22 @@ export default function LabelEditor() {
                           <p className='mb-1'>
                             {type === 'labels' ? 'Label to display' : type === 'badges' ? 'Badge to display' : type === 'badgeGroup' ? 'Badge to display' : type === 'labelGroup' ? 'Label to display' : ''}
                           </p>
-                          <s-select
+                          <select
                             value={selectedDropdown}
-                            onChange={(val) => {
-                              setSelectedDropdown(val);
-                              const pos = labelPositionsDropdown.find(p => p.id === val);
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setSelectedDropdown(value);
+
+                              const pos = labelPositionsDropdown.find(p => p.id === value);
                               if (pos) setSelected(pos.className);
                             }}
                           >
                             {labelPositionsDropdown.map((pos) => (
-                              <s-option key={pos.id} value={pos.id}>
+                              <option key={pos.id} value={pos.id}>
                                 {pos.label}
-                              </s-option>
+                              </option>
                             ))}
-                          </s-select>
+                          </select>
                         </div>
                         <div className="bg-gray-100 rounded-xl p-1 flex">
                           <button
@@ -2400,10 +2435,13 @@ export default function LabelEditor() {
                           {type === 'labels' ? 'Label to display' : type === 'badges' ? 'Badge to display' : type === 'badgeGroup' ? 'Badge to display' : type === 'labelGroup' ? 'Label to display' : ''}
                         </p>
                         <s-select
-                          value={selectedDropdown}
-                          onChange={(val) => {
-                            setSelectedDropdown(val);
-                            const pos = labelPositionsDropdown.find(p => p.id === val);
+                          onChange={(e) => {
+                            const value = e.detail?.value;
+                            if (!value) return;
+
+                            setSelectedDropdown(value);
+
+                            const pos = labelPositionsDropdown.find(p => p.id === value);
                             if (pos) setSelected(pos.className);
                           }}
                         >
@@ -3097,7 +3135,7 @@ export default function LabelEditor() {
         {/* RIGHT PANEL */}
         <div className="flex-1 bg-[#F6F6F7] overflow-y-auto border rounded-xl flex flex-col items-center">
           <div className="w-full border-b bg-white px-3 md:px-4 py-3">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="flex flex-row md:items-center justify-between gap-3">
 
               <div className="flex items-center justify-between md:justify-start gap-3">
                 <p className="font-bold text-black">
@@ -3149,7 +3187,7 @@ export default function LabelEditor() {
               </div>
 
               <div className='flex gap-5 items-center'>
-                <div className='border-r pr-3'>
+                <div className='border-r-0 md:border-r pr-3'>
                   <button
                     className='hover:bg-[#EBEBEB] p-1 rounded-md'
                     commandFor="preview-modal"
@@ -3257,7 +3295,7 @@ export default function LabelEditor() {
               <div className={`space-y-4 bg-white rounded-2xl shadow-sm border p-3 md:p-5 ${active === 'mobile' ? 'm-0' : 'm-2 md:m-5'}`}>
                 {previewPage === "collection" && (
                   <>
-                    <p className="font-semibold text-xl">Your products</p>
+                    <p className="font-semibold text-base md:text-xl">Your products</p>
 
                     <div className={active === 'mobile' ? "grid grid-cols-2 gap-3" : "grid pb-4 grid-cols-2 md:grid-cols-4 gap-4"}>
                       {[1, 2, 3, 4].map((item) => (
@@ -3455,7 +3493,7 @@ export default function LabelEditor() {
                           <div className="mt-3 space-y-1">
                             <div className='flex flex-col gap-2 mb-3'>
                               <div className='flex gap-3 items-center'>
-                                {type === 'badges' && <div
+                                {type === 'badges' && !inlinePositions.includes(selectedDropdown) && <div
                                   className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
                                   style={{
                                     width: `${finalWidth}px`,
@@ -3546,6 +3584,94 @@ export default function LabelEditor() {
                                 <p className={`${active === 'mobile' ? 'text-[13px]' : 'text-[16px]'} font-semibold text-gray-900`}>
                                   Demo product
                                 </p>
+                                {type === 'badges' && inlinePositions.includes(selectedDropdown) && <div
+                                  className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
+                                  style={{
+                                    width: `${finalWidth}px`,
+                                    height: `${finalHeight}px`,
+                                    opacity: badgeOpacity / 100,
+                                    margin: `${badgeMargin}px`,
+                                    padding: `${finalPadding}px`,
+                                    borderRadius: `${badgeRadius}px`,
+                                    ...(labelType === 'shape'
+                                      ? {
+                                        background:
+                                          fillType === "solid"
+                                            ? color1
+                                            : fillType === "gradient"
+                                              ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                              : "transparent",
+
+                                        WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                        WebkitMaskSize: '100% 100%',
+                                        WebkitMaskRepeat: 'no-repeat',
+                                        WebkitMaskPosition: 'center',
+                                        maskImage: `url(${shapeImages[shape]})`,
+                                        maskSize: '100% 100%',
+                                        maskRepeat: 'no-repeat',
+                                        maskPosition: 'center',
+                                      }
+                                      : {
+                                        background: 'transparent',
+                                      }),
+                                  }}
+                                >
+                                  {labelType === 'shape' ? (
+                                    <div
+                                      className="w-full h-full flex items-center"
+                                      style={{ color: textColor, textAlign: alignment }}
+                                    >
+                                      <span
+                                        tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                        role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                        onClick={() => {
+                                          if (isActionLinkEnabled && actionLinkUrl) {
+                                            window.open(actionLinkUrl, "_blank");
+                                          }
+                                        }}
+                                        className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                        style={{
+                                          fontFamily: fontFamily,
+                                          lineHeight: '1.2',
+                                          display: '-webkit-box',
+                                          WebkitLineClamp: 2,
+                                          WebkitBoxOrient: 'vertical',
+                                          wordBreak: 'break-word',
+                                          ...parseCustomCss(customCss),
+                                          ...style
+                                        }}
+                                      >
+                                        {labelText}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    selectedImageUrl && (
+                                      <div
+                                        title={isTooltipEnabled ? labelTooltip : ""}
+                                        tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                        role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                        onClick={() => {
+                                          if (isActionLinkEnabled && actionLinkUrl) {
+                                            window.open(actionLinkUrl, "_blank");
+                                          }
+                                        }}
+                                        className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                          } flex justify-center items-center`}
+                                      >
+                                        <img
+                                          src={selectedImageUrl}
+                                          alt="label"
+                                          className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                            } object-contain`}
+                                        />
+                                      </div>
+                                    )
+                                  )}
+                                </div>}
                               </div>
                               {type === 'badgeGroup' && selectedImages.length > 0 && (
                                 <div className="flex gap-2">
