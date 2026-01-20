@@ -109,7 +109,7 @@ export default function LabelEditor() {
   const [selectedImageUrl, setSelectedImageUrl] = useState(type === 'badges' ? Label6 : TrustBadge1);
   const [previewPage, setPreviewPage] = useState("collection");
   const [productAlign, setProductAlign] = useState("left");
-  const [selectedDropdown, setSelectedDropdown] = useState("above-title");
+  const [selectedDropdown, setSelectedDropdown] = useState("before-title");
   const [selectedDisplayType, setSelectedDisplayType] = useState('horizontal');
   const [badgeWidth, setBadgeWidth] = useState(110);
   const [badgeHeight, setBadgeHeight] = useState(45);
@@ -396,37 +396,6 @@ export default function LabelEditor() {
     return map[pos] || "top-0 left-0";
   };
 
-  const getPositionAboveClasses = (position) => {
-  switch (position) {
-    case 'above-title':
-      return 'absolute -top-3 left-0';
-
-    case 'below-title':
-      return 'absolute top-full left-0 mt-1';
-
-    case 'above-price':
-      return 'absolute -top-3 right-0';
-
-    case 'below-price':
-      return 'absolute top-full right-0 mt-1';
-
-    case 'before-title':
-      return 'mr-2';
-
-    case 'after-title':
-      return 'ml-2';
-
-    case 'before-price':
-      return 'mr-2';
-
-    case 'after-price':
-      return 'ml-2';
-
-    default:
-      return '';
-  }
-};
-
   const getProductLabelAlign = () => {
     switch (productAlign) {
       case "left":
@@ -441,8 +410,8 @@ export default function LabelEditor() {
   const labelPositionsDropdown = [
     { id: 'below-price', label: 'Below product price', className: 'bottom-left' },
     { id: 'above-price', label: 'Above product price', className: 'top-right' },
-    { id: 'above-title', label: 'Above product title', className: 'top-left' },
     { id: 'below-title', label: 'Below product title', className: 'bottom-right' },
+    { id: 'above-title', label: 'Above product title', className: 'top-left' },
     { id: 'before-title', label: 'Before product title', className: 'middle-left' },
     { id: 'after-title', label: 'After product title', className: 'middle-right' },
     { id: 'before-price', label: 'Before product price', className: 'top-center' },
@@ -2436,7 +2405,7 @@ export default function LabelEditor() {
                         </p>
                         <s-select
                           onChange={(e) => {
-                            const value = e.detail?.value;
+                            const value = e.target.value;
                             if (!value) return;
 
                             setSelectedDropdown(value);
@@ -3492,8 +3461,96 @@ export default function LabelEditor() {
 
                           <div className="mt-3 space-y-1">
                             <div className='flex flex-col gap-2 mb-3'>
+                              {type === 'badges' && selectedDropdown === 'above-title' && <div
+                                className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
+                                style={{
+                                  width: `${finalWidth}px`,
+                                  height: `${finalHeight}px`,
+                                  opacity: badgeOpacity / 100,
+                                  margin: `${badgeMargin}px`,
+                                  padding: `${finalPadding}px`,
+                                  borderRadius: `${badgeRadius}px`,
+                                  ...(labelType === 'shape'
+                                    ? {
+                                      background:
+                                        fillType === "solid"
+                                          ? color1
+                                          : fillType === "gradient"
+                                            ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                            : "transparent",
+
+                                      WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                      WebkitMaskSize: '100% 100%',
+                                      WebkitMaskRepeat: 'no-repeat',
+                                      WebkitMaskPosition: 'center',
+                                      maskImage: `url(${shapeImages[shape]})`,
+                                      maskSize: '100% 100%',
+                                      maskRepeat: 'no-repeat',
+                                      maskPosition: 'center',
+                                    }
+                                    : {
+                                      background: 'transparent',
+                                    }),
+                                }}
+                              >
+                                {labelType === 'shape' ? (
+                                  <div
+                                    className="w-full h-full flex items-center"
+                                    style={{ color: textColor, textAlign: alignment }}
+                                  >
+                                    <span
+                                      tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                      role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                      onClick={() => {
+                                        if (isActionLinkEnabled && actionLinkUrl) {
+                                          window.open(actionLinkUrl, "_blank");
+                                        }
+                                      }}
+                                      className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                      style={{
+                                        fontFamily: fontFamily,
+                                        lineHeight: '1.2',
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 2,
+                                        WebkitBoxOrient: 'vertical',
+                                        wordBreak: 'break-word',
+                                        ...parseCustomCss(customCss),
+                                        ...style
+                                      }}
+                                    >
+                                      {labelText}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  selectedImageUrl && (
+                                    <div
+                                      title={isTooltipEnabled ? labelTooltip : ""}
+                                      tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                      role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                      onClick={() => {
+                                        if (isActionLinkEnabled && actionLinkUrl) {
+                                          window.open(actionLinkUrl, "_blank");
+                                        }
+                                      }}
+                                      className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                        } flex justify-center items-center`}
+                                    >
+                                      <img
+                                        src={selectedImageUrl}
+                                        alt="label"
+                                        className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                          } object-contain`}
+                                      />
+                                    </div>
+                                  )
+                                )}
+                              </div>}
                               <div className='flex gap-3 items-center'>
-                                {type === 'badges' && !inlinePositions.includes(selectedDropdown) && <div
+                                {type === 'badges' && selectedDropdown === 'before-title' && <div
                                   className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
                                   style={{
                                     width: `${finalWidth}px`,
@@ -3584,7 +3641,7 @@ export default function LabelEditor() {
                                 <p className={`${active === 'mobile' ? 'text-[13px]' : 'text-[16px]'} font-semibold text-gray-900`}>
                                   Demo product
                                 </p>
-                                {type === 'badges' && inlinePositions.includes(selectedDropdown) && <div
+                                {type === 'badges' && selectedDropdown === 'after-title' && <div
                                   className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
                                   style={{
                                     width: `${finalWidth}px`,
@@ -3673,6 +3730,94 @@ export default function LabelEditor() {
                                   )}
                                 </div>}
                               </div>
+                              {type === 'badges' && selectedDropdown === 'below-title' && <div
+                                className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
+                                style={{
+                                  width: `${finalWidth}px`,
+                                  height: `${finalHeight}px`,
+                                  opacity: badgeOpacity / 100,
+                                  margin: `${badgeMargin}px`,
+                                  padding: `${finalPadding}px`,
+                                  borderRadius: `${badgeRadius}px`,
+                                  ...(labelType === 'shape'
+                                    ? {
+                                      background:
+                                        fillType === "solid"
+                                          ? color1
+                                          : fillType === "gradient"
+                                            ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                            : "transparent",
+
+                                      WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                      WebkitMaskSize: '100% 100%',
+                                      WebkitMaskRepeat: 'no-repeat',
+                                      WebkitMaskPosition: 'center',
+                                      maskImage: `url(${shapeImages[shape]})`,
+                                      maskSize: '100% 100%',
+                                      maskRepeat: 'no-repeat',
+                                      maskPosition: 'center',
+                                    }
+                                    : {
+                                      background: 'transparent',
+                                    }),
+                                }}
+                              >
+                                {labelType === 'shape' ? (
+                                  <div
+                                    className="w-full h-full flex items-center"
+                                    style={{ color: textColor, textAlign: alignment }}
+                                  >
+                                    <span
+                                      tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                      role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                      onClick={() => {
+                                        if (isActionLinkEnabled && actionLinkUrl) {
+                                          window.open(actionLinkUrl, "_blank");
+                                        }
+                                      }}
+                                      className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                      style={{
+                                        fontFamily: fontFamily,
+                                        lineHeight: '1.2',
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 2,
+                                        WebkitBoxOrient: 'vertical',
+                                        wordBreak: 'break-word',
+                                        ...parseCustomCss(customCss),
+                                        ...style
+                                      }}
+                                    >
+                                      {labelText}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  selectedImageUrl && (
+                                    <div
+                                      title={isTooltipEnabled ? labelTooltip : ""}
+                                      tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                      role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                      onClick={() => {
+                                        if (isActionLinkEnabled && actionLinkUrl) {
+                                          window.open(actionLinkUrl, "_blank");
+                                        }
+                                      }}
+                                      className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                        } flex justify-center items-center`}
+                                    >
+                                      <img
+                                        src={selectedImageUrl}
+                                        alt="label"
+                                        className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                          } object-contain`}
+                                      />
+                                    </div>
+                                  )
+                                )}
+                              </div>}
                               {type === 'badgeGroup' && selectedImages.length > 0 && (
                                 <div className="flex gap-2">
                                   {selectedImages.map((url, index) => (
@@ -3686,7 +3831,365 @@ export default function LabelEditor() {
                                 </div>
                               )}
                             </div>
-                            <p className={`${active === 'mobile' ? 'text-[12px]' : 'text-gray-600'} font-medium`}>$16.00</p>
+                            {type === 'badges' && selectedDropdown === 'above-price' && <div
+                              className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
+                              style={{
+                                width: `${finalWidth}px`,
+                                height: `${finalHeight}px`,
+                                opacity: badgeOpacity / 100,
+                                margin: `${badgeMargin}px`,
+                                padding: `${finalPadding}px`,
+                                borderRadius: `${badgeRadius}px`,
+                                ...(labelType === 'shape'
+                                  ? {
+                                    background:
+                                      fillType === "solid"
+                                        ? color1
+                                        : fillType === "gradient"
+                                          ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                          : "transparent",
+
+                                    WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                    WebkitMaskSize: '100% 100%',
+                                    WebkitMaskRepeat: 'no-repeat',
+                                    WebkitMaskPosition: 'center',
+                                    maskImage: `url(${shapeImages[shape]})`,
+                                    maskSize: '100% 100%',
+                                    maskRepeat: 'no-repeat',
+                                    maskPosition: 'center',
+                                  }
+                                  : {
+                                    background: 'transparent',
+                                  }),
+                              }}
+                            >
+                              {labelType === 'shape' ? (
+                                <div
+                                  className="w-full h-full flex items-center"
+                                  style={{ color: textColor, textAlign: alignment }}
+                                >
+                                  <span
+                                    tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                    role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                    onClick={() => {
+                                      if (isActionLinkEnabled && actionLinkUrl) {
+                                        window.open(actionLinkUrl, "_blank");
+                                      }
+                                    }}
+                                    className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                    style={{
+                                      fontFamily: fontFamily,
+                                      lineHeight: '1.2',
+                                      display: '-webkit-box',
+                                      WebkitLineClamp: 2,
+                                      WebkitBoxOrient: 'vertical',
+                                      wordBreak: 'break-word',
+                                      ...parseCustomCss(customCss),
+                                      ...style
+                                    }}
+                                  >
+                                    {labelText}
+                                  </span>
+                                </div>
+                              ) : (
+                                selectedImageUrl && (
+                                  <div
+                                    title={isTooltipEnabled ? labelTooltip : ""}
+                                    tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                    role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                    onClick={() => {
+                                      if (isActionLinkEnabled && actionLinkUrl) {
+                                        window.open(actionLinkUrl, "_blank");
+                                      }
+                                    }}
+                                    className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                      } flex justify-center items-center`}
+                                  >
+                                    <img
+                                      src={selectedImageUrl}
+                                      alt="label"
+                                      className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                        } object-contain`}
+                                    />
+                                  </div>
+                                )
+                              )}
+                            </div>}
+                            <p className={`${active === 'mobile' ? 'text-[12px]' : 'text-gray-600'} font-medium flex items-center gap-3`}>
+                              <div>
+                                {type === 'badges' && selectedDropdown === 'before-price' && <div
+                                  className={`z-10 flex items-center transition-all duration-300 !translate-x-0 ${getPositionClasses(selected)}`}
+                                  style={{
+                                    width: `${finalWidth}px`,
+                                    height: `${finalHeight}px`,
+                                    opacity: badgeOpacity / 100,
+                                    margin: `${badgeMargin}px`,
+                                    padding: `${finalPadding}px`,
+                                    borderRadius: `${badgeRadius}px`,
+                                    ...(labelType === 'shape'
+                                      ? {
+                                        background:
+                                          fillType === "solid"
+                                            ? color1
+                                            : fillType === "gradient"
+                                              ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                              : "transparent",
+
+                                        WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                        WebkitMaskSize: '100% 100%',
+                                        WebkitMaskRepeat: 'no-repeat',
+                                        WebkitMaskPosition: 'center',
+                                        maskImage: `url(${shapeImages[shape]})`,
+                                        maskSize: '100% 100%',
+                                        maskRepeat: 'no-repeat',
+                                        maskPosition: 'center',
+                                      }
+                                      : {
+                                        background: 'transparent',
+                                      }),
+                                  }}
+                                >
+                                  {labelType === 'shape' ? (
+                                    <div
+                                      className="w-full h-full flex items-center"
+                                      style={{ color: textColor, textAlign: alignment }}
+                                    >
+                                      <span
+                                        tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                        role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                        onClick={() => {
+                                          if (isActionLinkEnabled && actionLinkUrl) {
+                                            window.open(actionLinkUrl, "_blank");
+                                          }
+                                        }}
+                                        className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                        style={{
+                                          fontFamily: fontFamily,
+                                          lineHeight: '1.2',
+                                          display: '-webkit-box',
+                                          WebkitLineClamp: 2,
+                                          WebkitBoxOrient: 'vertical',
+                                          wordBreak: 'break-word',
+                                          ...parseCustomCss(customCss),
+                                          ...style
+                                        }}
+                                      >
+                                        {labelText}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    selectedImageUrl && (
+                                      <div
+                                        title={isTooltipEnabled ? labelTooltip : ""}
+                                        tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                        role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                        onClick={() => {
+                                          if (isActionLinkEnabled && actionLinkUrl) {
+                                            window.open(actionLinkUrl, "_blank");
+                                          }
+                                        }}
+                                        className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                          } flex justify-center items-center`}
+                                      >
+                                        <img
+                                          src={selectedImageUrl}
+                                          alt="label"
+                                          className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                            } object-contain`}
+                                        />
+                                      </div>
+                                    )
+                                  )}
+                                </div>}
+                              </div>
+                              <span>$16.00</span>
+                              <div>
+                                {type === 'badges' && selectedDropdown === 'after-price' && <div
+                                  className={`z-10 flex items-center transition-all duration-300 !translate-x-0 ${getPositionClasses(selected)}`}
+                                  style={{
+                                    width: `${finalWidth}px`,
+                                    height: `${finalHeight}px`,
+                                    opacity: badgeOpacity / 100,
+                                    margin: `${badgeMargin}px`,
+                                    padding: `${finalPadding}px`,
+                                    borderRadius: `${badgeRadius}px`,
+                                    ...(labelType === 'shape'
+                                      ? {
+                                        background:
+                                          fillType === "solid"
+                                            ? color1
+                                            : fillType === "gradient"
+                                              ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                              : "transparent",
+
+                                        WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                        WebkitMaskSize: '100% 100%',
+                                        WebkitMaskRepeat: 'no-repeat',
+                                        WebkitMaskPosition: 'center',
+                                        maskImage: `url(${shapeImages[shape]})`,
+                                        maskSize: '100% 100%',
+                                        maskRepeat: 'no-repeat',
+                                        maskPosition: 'center',
+                                      }
+                                      : {
+                                        background: 'transparent',
+                                      }),
+                                  }}
+                                >
+                                  {labelType === 'shape' ? (
+                                    <div
+                                      className="w-full h-full flex items-center"
+                                      style={{ color: textColor, textAlign: alignment }}
+                                    >
+                                      <span
+                                        tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                        role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                        onClick={() => {
+                                          if (isActionLinkEnabled && actionLinkUrl) {
+                                            window.open(actionLinkUrl, "_blank");
+                                          }
+                                        }}
+                                        className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                        style={{
+                                          fontFamily: fontFamily,
+                                          lineHeight: '1.2',
+                                          display: '-webkit-box',
+                                          WebkitLineClamp: 2,
+                                          WebkitBoxOrient: 'vertical',
+                                          wordBreak: 'break-word',
+                                          ...parseCustomCss(customCss),
+                                          ...style
+                                        }}
+                                      >
+                                        {labelText}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    selectedImageUrl && (
+                                      <div
+                                        title={isTooltipEnabled ? labelTooltip : ""}
+                                        tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                        role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                        onClick={() => {
+                                          if (isActionLinkEnabled && actionLinkUrl) {
+                                            window.open(actionLinkUrl, "_blank");
+                                          }
+                                        }}
+                                        className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                          } flex justify-center items-center`}
+                                      >
+                                        <img
+                                          src={selectedImageUrl}
+                                          alt="label"
+                                          className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                            } object-contain`}
+                                        />
+                                      </div>
+                                    )
+                                  )}
+                                </div>}
+                              </div>
+                            </p>
+                            {type === 'badges' && selectedDropdown === 'below-price' && <div
+                              className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
+                              style={{
+                                width: `${finalWidth}px`,
+                                height: `${finalHeight}px`,
+                                opacity: badgeOpacity / 100,
+                                margin: `${badgeMargin}px`,
+                                padding: `${finalPadding}px`,
+                                borderRadius: `${badgeRadius}px`,
+                                ...(labelType === 'shape'
+                                  ? {
+                                    background:
+                                      fillType === "solid"
+                                        ? color1
+                                        : fillType === "gradient"
+                                          ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                          : "transparent",
+
+                                    WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                    WebkitMaskSize: '100% 100%',
+                                    WebkitMaskRepeat: 'no-repeat',
+                                    WebkitMaskPosition: 'center',
+                                    maskImage: `url(${shapeImages[shape]})`,
+                                    maskSize: '100% 100%',
+                                    maskRepeat: 'no-repeat',
+                                    maskPosition: 'center',
+                                  }
+                                  : {
+                                    background: 'transparent',
+                                  }),
+                              }}
+                            >
+                              {labelType === 'shape' ? (
+                                <div
+                                  className="w-full h-full flex items-center"
+                                  style={{ color: textColor, textAlign: alignment }}
+                                >
+                                  <span
+                                    tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                    role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                    onClick={() => {
+                                      if (isActionLinkEnabled && actionLinkUrl) {
+                                        window.open(actionLinkUrl, "_blank");
+                                      }
+                                    }}
+                                    className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                    style={{
+                                      fontFamily: fontFamily,
+                                      lineHeight: '1.2',
+                                      display: '-webkit-box',
+                                      WebkitLineClamp: 2,
+                                      WebkitBoxOrient: 'vertical',
+                                      wordBreak: 'break-word',
+                                      ...parseCustomCss(customCss),
+                                      ...style
+                                    }}
+                                  >
+                                    {labelText}
+                                  </span>
+                                </div>
+                              ) : (
+                                selectedImageUrl && (
+                                  <div
+                                    title={isTooltipEnabled ? labelTooltip : ""}
+                                    tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                    role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                    onClick={() => {
+                                      if (isActionLinkEnabled && actionLinkUrl) {
+                                        window.open(actionLinkUrl, "_blank");
+                                      }
+                                    }}
+                                    className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                      } flex justify-center items-center`}
+                                  >
+                                    <img
+                                      src={selectedImageUrl}
+                                      alt="label"
+                                      className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                        } object-contain`}
+                                    />
+                                  </div>
+                                )
+                              )}
+                            </div>}
                           </div>
                         </div>
                       ))}
@@ -3794,9 +4297,541 @@ export default function LabelEditor() {
                     </div>
 
                     <div className="space-y-3">
-                      <p className="text-2xl font-bold">Demo product</p>
-                      <p className="text-lg font-semibold">$16.00</p>
-                      {type === 'badges' && <div className={`flex ${getProductLabelAlign()} mb-1`}>
+                      {type === 'badges' && selectedDropdown === 'above-title' && <div
+                        className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
+                        style={{
+                          width: `${finalWidth}px`,
+                          height: `${finalHeight}px`,
+                          opacity: badgeOpacity / 100,
+                          margin: `${badgeMargin}px`,
+                          padding: `${finalPadding}px`,
+                          borderRadius: `${badgeRadius}px`,
+                          ...(labelType === 'shape'
+                            ? {
+                              background:
+                                fillType === "solid"
+                                  ? color1
+                                  : fillType === "gradient"
+                                    ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                    : "transparent",
+
+                              WebkitMaskImage: `url(${shapeImages[shape]})`,
+                              WebkitMaskSize: '100% 100%',
+                              WebkitMaskRepeat: 'no-repeat',
+                              WebkitMaskPosition: 'center',
+                              maskImage: `url(${shapeImages[shape]})`,
+                              maskSize: '100% 100%',
+                              maskRepeat: 'no-repeat',
+                              maskPosition: 'center',
+                            }
+                            : {
+                              background: 'transparent',
+                            }),
+                        }}
+                      >
+                        {labelType === 'shape' ? (
+                          <div
+                            className="w-full h-full flex items-center"
+                            style={{ color: textColor, textAlign: alignment }}
+                          >
+                            <span
+                              tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                              role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                              onClick={() => {
+                                if (isActionLinkEnabled && actionLinkUrl) {
+                                  window.open(actionLinkUrl, "_blank");
+                                }
+                              }}
+                              className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                              style={{
+                                fontFamily: fontFamily,
+                                lineHeight: '1.2',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                wordBreak: 'break-word',
+                                ...parseCustomCss(customCss),
+                                ...style
+                              }}
+                            >
+                              {labelText}
+                            </span>
+                          </div>
+                        ) : (
+                          selectedImageUrl && (
+                            <div
+                              title={isTooltipEnabled ? labelTooltip : ""}
+                              tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                              role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                              onClick={() => {
+                                if (isActionLinkEnabled && actionLinkUrl) {
+                                  window.open(actionLinkUrl, "_blank");
+                                }
+                              }}
+                              className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                } flex justify-center items-center`}
+                            >
+                              <img
+                                src={selectedImageUrl}
+                                alt="label"
+                                className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                  } object-contain`}
+                              />
+                            </div>
+                          )
+                        )}
+                      </div>}
+                      <div className='flex gap-3 items-center'>
+                        {type === 'badges' && selectedDropdown === 'before-title' && <div
+                          className={`z-10 flex items-center transition-all duration-300 !translate-y-0 ${getPositionClasses(selected)}`}
+                          style={{
+                            width: `${finalWidth}px`,
+                            height: `${finalHeight}px`,
+                            opacity: badgeOpacity / 100,
+                            margin: `${badgeMargin}px`,
+                            padding: `${finalPadding}px`,
+                            borderRadius: `${badgeRadius}px`,
+                            ...(labelType === 'shape'
+                              ? {
+                                background:
+                                  fillType === "solid"
+                                    ? color1
+                                    : fillType === "gradient"
+                                      ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                      : "transparent",
+
+                                WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                WebkitMaskSize: '100% 100%',
+                                WebkitMaskRepeat: 'no-repeat',
+                                WebkitMaskPosition: 'center',
+                                maskImage: `url(${shapeImages[shape]})`,
+                                maskSize: '100% 100%',
+                                maskRepeat: 'no-repeat',
+                                maskPosition: 'center',
+                              }
+                              : {
+                                background: 'transparent',
+                              }),
+                          }}
+                        >
+                          {labelType === 'shape' ? (
+                            <div
+                              className="w-full h-full flex items-center"
+                              style={{ color: textColor, textAlign: alignment }}
+                            >
+                              <span
+                                tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                onClick={() => {
+                                  if (isActionLinkEnabled && actionLinkUrl) {
+                                    window.open(actionLinkUrl, "_blank");
+                                  }
+                                }}
+                                className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                style={{
+                                  fontFamily: fontFamily,
+                                  lineHeight: '1.2',
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  wordBreak: 'break-word',
+                                  ...parseCustomCss(customCss),
+                                  ...style
+                                }}
+                              >
+                                {labelText}
+                              </span>
+                            </div>
+                          ) : (
+                            selectedImageUrl && (
+                              <div
+                                title={isTooltipEnabled ? labelTooltip : ""}
+                                tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                onClick={() => {
+                                  if (isActionLinkEnabled && actionLinkUrl) {
+                                    window.open(actionLinkUrl, "_blank");
+                                  }
+                                }}
+                                className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                  } flex justify-center items-center`}
+                              >
+                                <img
+                                  src={selectedImageUrl}
+                                  alt="label"
+                                  className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                    } object-contain`}
+                                />
+                              </div>
+                            )
+                          )}
+                        </div>}
+                        <p className="text-2xl font-bold mb-3">Demo product</p>
+                        {type === 'badges' && selectedDropdown === 'after-title' && <div
+                          className={`z-10 flex items-center transition-all duration-300 !translate-y-0 ${getPositionClasses(selected)}`}
+                          style={{
+                            width: `${finalWidth}px`,
+                            height: `${finalHeight}px`,
+                            opacity: badgeOpacity / 100,
+                            margin: `${badgeMargin}px`,
+                            padding: `${finalPadding}px`,
+                            borderRadius: `${badgeRadius}px`,
+                            ...(labelType === 'shape'
+                              ? {
+                                background:
+                                  fillType === "solid"
+                                    ? color1
+                                    : fillType === "gradient"
+                                      ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                      : "transparent",
+
+                                WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                WebkitMaskSize: '100% 100%',
+                                WebkitMaskRepeat: 'no-repeat',
+                                WebkitMaskPosition: 'center',
+                                maskImage: `url(${shapeImages[shape]})`,
+                                maskSize: '100% 100%',
+                                maskRepeat: 'no-repeat',
+                                maskPosition: 'center',
+                              }
+                              : {
+                                background: 'transparent',
+                              }),
+                          }}
+                        >
+                          {labelType === 'shape' ? (
+                            <div
+                              className="w-full h-full flex items-center"
+                              style={{ color: textColor, textAlign: alignment }}
+                            >
+                              <span
+                                tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                onClick={() => {
+                                  if (isActionLinkEnabled && actionLinkUrl) {
+                                    window.open(actionLinkUrl, "_blank");
+                                  }
+                                }}
+                                className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                style={{
+                                  fontFamily: fontFamily,
+                                  lineHeight: '1.2',
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  wordBreak: 'break-word',
+                                  ...parseCustomCss(customCss),
+                                  ...style
+                                }}
+                              >
+                                {labelText}
+                              </span>
+                            </div>
+                          ) : (
+                            selectedImageUrl && (
+                              <div
+                                title={isTooltipEnabled ? labelTooltip : ""}
+                                tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                onClick={() => {
+                                  if (isActionLinkEnabled && actionLinkUrl) {
+                                    window.open(actionLinkUrl, "_blank");
+                                  }
+                                }}
+                                className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                  } flex justify-center items-center`}
+                              >
+                                <img
+                                  src={selectedImageUrl}
+                                  alt="label"
+                                  className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                    } object-contain`}
+                                />
+                              </div>
+                            )
+                          )}
+                        </div>}
+                      </div>
+                      {type === 'badges' && (selectedDropdown === 'below-title' || selectedDropdown === 'above-price') && <div
+                        className={`z-10 flex items-center transition-all duration-300 ${getPositionClasses(selected)}`}
+                        style={{
+                          width: `${finalWidth}px`,
+                          height: `${finalHeight}px`,
+                          opacity: badgeOpacity / 100,
+                          margin: `${badgeMargin}px`,
+                          padding: `${finalPadding}px`,
+                          borderRadius: `${badgeRadius}px`,
+                          ...(labelType === 'shape'
+                            ? {
+                              background:
+                                fillType === "solid"
+                                  ? color1
+                                  : fillType === "gradient"
+                                    ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                    : "transparent",
+
+                              WebkitMaskImage: `url(${shapeImages[shape]})`,
+                              WebkitMaskSize: '100% 100%',
+                              WebkitMaskRepeat: 'no-repeat',
+                              WebkitMaskPosition: 'center',
+                              maskImage: `url(${shapeImages[shape]})`,
+                              maskSize: '100% 100%',
+                              maskRepeat: 'no-repeat',
+                              maskPosition: 'center',
+                            }
+                            : {
+                              background: 'transparent',
+                            }),
+                        }}
+                      >
+                        {labelType === 'shape' ? (
+                          <div
+                            className="w-full h-full flex items-center"
+                            style={{ color: textColor, textAlign: alignment }}
+                          >
+                            <span
+                              tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                              role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                              onClick={() => {
+                                if (isActionLinkEnabled && actionLinkUrl) {
+                                  window.open(actionLinkUrl, "_blank");
+                                }
+                              }}
+                              className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                              style={{
+                                fontFamily: fontFamily,
+                                lineHeight: '1.2',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                wordBreak: 'break-word',
+                                ...parseCustomCss(customCss),
+                                ...style
+                              }}
+                            >
+                              {labelText}
+                            </span>
+                          </div>
+                        ) : (
+                          selectedImageUrl && (
+                            <div
+                              title={isTooltipEnabled ? labelTooltip : ""}
+                              tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                              role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                              onClick={() => {
+                                if (isActionLinkEnabled && actionLinkUrl) {
+                                  window.open(actionLinkUrl, "_blank");
+                                }
+                              }}
+                              className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                } flex justify-center items-center`}
+                            >
+                              <img
+                                src={selectedImageUrl}
+                                alt="label"
+                                className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                  } object-contain`}
+                              />
+                            </div>
+                          )
+                        )}
+                      </div>}
+                      <p className="text-lg font-semibold flex items-center gap-2">
+                        {type === 'badges' && selectedDropdown === 'before-price' && <div
+                          className={`z-10 flex items-center transition-all duration-300 !translate-y-0 !translate-x-0 ${getPositionClasses(selected)}`}
+                          style={{
+                            width: `${finalWidth}px`,
+                            height: `${finalHeight}px`,
+                            opacity: badgeOpacity / 100,
+                            margin: `${badgeMargin}px`,
+                            padding: `${finalPadding}px`,
+                            borderRadius: `${badgeRadius}px`,
+                            ...(labelType === 'shape'
+                              ? {
+                                background:
+                                  fillType === "solid"
+                                    ? color1
+                                    : fillType === "gradient"
+                                      ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                      : "transparent",
+
+                                WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                WebkitMaskSize: '100% 100%',
+                                WebkitMaskRepeat: 'no-repeat',
+                                WebkitMaskPosition: 'center',
+                                maskImage: `url(${shapeImages[shape]})`,
+                                maskSize: '100% 100%',
+                                maskRepeat: 'no-repeat',
+                                maskPosition: 'center',
+                              }
+                              : {
+                                background: 'transparent',
+                              }),
+                          }}
+                        >
+                          {labelType === 'shape' ? (
+                            <div
+                              className="w-full h-full flex items-center"
+                              style={{ color: textColor, textAlign: alignment }}
+                            >
+                              <span
+                                tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                onClick={() => {
+                                  if (isActionLinkEnabled && actionLinkUrl) {
+                                    window.open(actionLinkUrl, "_blank");
+                                  }
+                                }}
+                                className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                style={{
+                                  fontFamily: fontFamily,
+                                  lineHeight: '1.2',
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  wordBreak: 'break-word',
+                                  ...parseCustomCss(customCss),
+                                  ...style
+                                }}
+                              >
+                                {labelText}
+                              </span>
+                            </div>
+                          ) : (
+                            selectedImageUrl && (
+                              <div
+                                title={isTooltipEnabled ? labelTooltip : ""}
+                                tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                onClick={() => {
+                                  if (isActionLinkEnabled && actionLinkUrl) {
+                                    window.open(actionLinkUrl, "_blank");
+                                  }
+                                }}
+                                className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                  } flex justify-center items-center`}
+                              >
+                                <img
+                                  src={selectedImageUrl}
+                                  alt="label"
+                                  className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                    } object-contain`}
+                                />
+                              </div>
+                            )
+                          )}
+                        </div>}
+                        <span>$16.00</span>
+                        {type === 'badges' && selectedDropdown === 'after-price' && <div
+                          className={`z-10 flex items-center transition-all duration-300 !translate-y-0 !translate-x-0 ${getPositionClasses(selected)}`}
+                          style={{
+                            width: `${finalWidth}px`,
+                            height: `${finalHeight}px`,
+                            opacity: badgeOpacity / 100,
+                            margin: `${badgeMargin}px`,
+                            padding: `${finalPadding}px`,
+                            borderRadius: `${badgeRadius}px`,
+                            ...(labelType === 'shape'
+                              ? {
+                                background:
+                                  fillType === "solid"
+                                    ? color1
+                                    : fillType === "gradient"
+                                      ? `linear-gradient(90deg, ${color1}, ${color2})`
+                                      : "transparent",
+
+                                WebkitMaskImage: `url(${shapeImages[shape]})`,
+                                WebkitMaskSize: '100% 100%',
+                                WebkitMaskRepeat: 'no-repeat',
+                                WebkitMaskPosition: 'center',
+                                maskImage: `url(${shapeImages[shape]})`,
+                                maskSize: '100% 100%',
+                                maskRepeat: 'no-repeat',
+                                maskPosition: 'center',
+                              }
+                              : {
+                                background: 'transparent',
+                              }),
+                          }}
+                        >
+                          {labelType === 'shape' ? (
+                            <div
+                              className="w-full h-full flex items-center"
+                              style={{ color: textColor, textAlign: alignment }}
+                            >
+                              <span
+                                tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                onClick={() => {
+                                  if (isActionLinkEnabled && actionLinkUrl) {
+                                    window.open(actionLinkUrl, "_blank");
+                                  }
+                                }}
+                                className={`
+                                  ${active === 'mobile' ? 'text-[9px]' : 'text-[12px]'}
+                                  w-full
+                                  ${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer underline' : ''}
+                                `}
+                                style={{
+                                  fontFamily: fontFamily,
+                                  lineHeight: '1.2',
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                  wordBreak: 'break-word',
+                                  ...parseCustomCss(customCss),
+                                  ...style
+                                }}
+                              >
+                                {labelText}
+                              </span>
+                            </div>
+                          ) : (
+                            selectedImageUrl && (
+                              <div
+                                title={isTooltipEnabled ? labelTooltip : ""}
+                                tabIndex={isActionLinkEnabled && actionLinkUrl ? 0 : undefined}
+                                role={isActionLinkEnabled && actionLinkUrl ? "link" : undefined}
+                                onClick={() => {
+                                  if (isActionLinkEnabled && actionLinkUrl) {
+                                    window.open(actionLinkUrl, "_blank");
+                                  }
+                                }}
+                                className={`${isActionLinkEnabled && actionLinkUrl ? 'cursor-pointer' : ''
+                                  } flex justify-center items-center`}
+                              >
+                                <img
+                                  src={selectedImageUrl}
+                                  alt="label"
+                                  className={`${active === 'mobile' ? 'w-11 h-11' : 'w-14 h-14'
+                                    } object-contain`}
+                                />
+                              </div>
+                            )
+                          )}
+                        </div>}
+                      </p>
+                      {type === 'badges' && selectedDropdown === 'below-price' && <div className={`flex ${getProductLabelAlign()} mb-1`}>
                         <div
                           className="flex items-center"
                           style={{
