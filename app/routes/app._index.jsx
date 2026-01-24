@@ -2,18 +2,19 @@ import { useState } from "react";
 import enableAppImage from "../images/enable_app.png";
 import createLabel from "../images/create_label.png";
 import { useNavigate } from 'react-router-dom';
+// import Onboarding from "../component/Onboarding";
 
 export default function Index() {
   const navigate = useNavigate();
   // const [openDatePicker, setOpenDatePicker] = useState(false);
   const [isAppEnabled, setIsAppEnabled] = useState(false);
-
   const completed = 1;
   const total = 3;
   const percent = (completed / total) * 100;
 
   return (
     <s-page heading="Dashboard">
+      {/* <Onboarding /> */}
       <div className="m-4 md:m-0 border rounded-xl bg-white p-4 !my-4">
         <s-card>
           <div className="space-y-3">
